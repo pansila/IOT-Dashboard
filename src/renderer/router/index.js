@@ -8,7 +8,7 @@ export default new Router({
     {
       path: '/',
       name: 'landing-page',
-      component: require('@/components/NavBar').default
+      component: require('@/components/TabBar').default
     },
     {
       path: '/about',
