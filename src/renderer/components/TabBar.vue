@@ -12,9 +12,20 @@
               </b-btn>
               <b-card-footer>Tab footer {{i}}</b-card-footer>
             </b-tab>
-            <b-nav-item slot="tabs" @click.prevent="newTab" href="#">
+            <b-nav-item slot="tabs" v-b-modal.comm-config-modal href="#">
               +
             </b-nav-item>
+            <b-modal id="comm-config-modal"
+                     ref="commModal"
+                     title="配置串口信息"
+                     @ok="onCommOk"
+                     @shown="clearName">
+              <form @submit.stop.prevent="handleSubmit" size="lg">
+                <b-form-input type="text"
+                              placeholder="Enter your name"
+                              v-model="name"></b-form-input>
+              </form>
+            </b-modal>
             <!-- Render this if no tabs -->
             <div slot="empty" class="text-center text-muted">
               There are no open tabs
@@ -60,7 +71,9 @@
     data () {
       return {
         tabs: [],
-        tabCounter: 0
+        tabCounter: 0,
+        name: '',
+        names: []
       }
     },
     computed: {
@@ -74,12 +87,6 @@
             this.tabs.splice(i, 1)
           }
         }
-      },
-      newTab () {
-        this.getCOMM().then(commList => {
-          console.log(commList)
-          this.tabs.push(this.tabCounter++)
-        })
       },
       getCOMM () {
         return new Promise((resolve, reject) =>
@@ -97,6 +104,22 @@
             resolve(commList)
           })
         )
+      },
+      clearName () {
+        this.name = ''
+      },
+      onCommOk (evt) {
+        // Prevent modal from closing
+        evt.preventDefault()
+        if (!this.name) {
+          alert('Please enter your name')
+        } else {
+          this.getCOMM().then(commList => {
+            console.log(commList)
+            this.tabs.push(this.tabCounter++)
+            this.$refs.commModal.hide()
+          })
+        }
       }
     }
   }
