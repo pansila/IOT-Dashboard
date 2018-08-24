@@ -55,18 +55,6 @@
 <script>
   import serialport from 'serialport'
   
-  serialport.list((err, ports) => {
-    console.log(JSON.stringify(ports))
-    if (err) {
-      console.log(err)
-      return
-    }
-    var outStr = ports.map(port => {
-      return port.comName
-    }).join(', ')
-    console.log(outStr)
-  })
-  
   export default {
     name: 'tabbar',
     data () {
@@ -88,7 +76,27 @@
         }
       },
       newTab () {
-        this.tabs.push(this.tabCounter++)
+        this.getCOMM().then(commList => {
+          console.log(commList)
+          this.tabs.push(this.tabCounter++)
+        })
+      },
+      getCOMM () {
+        return new Promise((resolve, reject) =>
+          serialport.list((err, ports) => {
+            let commList
+            // console.log(JSON.stringify(ports))
+            if (err) {
+              reject(err)
+              console.log(err)
+              return
+            }
+            commList = ports.map(port => {
+              return port.comName
+            })
+            resolve(commList)
+          })
+        )
       }
     }
   }
