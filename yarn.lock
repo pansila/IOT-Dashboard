@@ -9228,6 +9228,10 @@ xtend@~2.1.1:
   dependencies:
     object-keys "~0.4.0"
 
+xterm@^3.6.0:
+  version "3.6.0"
+  resolved "http://r.cnpmjs.org/xterm/download/xterm-3.6.0.tgz#9b95cd23a338e5842343aec1a104f094c5153e7c"
+
 y18n@^3.2.1:
   version "3.2.1"
   resolved "http://r.cnpmjs.org/y18n/download/y18n-3.2.1.tgz#6d15fba884c08679c0d77e88e7759e811e07fa41"

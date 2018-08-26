@@ -5,12 +5,12 @@
         <b-tab no-body title="控制台" active @click="onConsolePage(0)">
           <b-tabs pills card end>
             <b-tab no-body :title="commList[i]" v-for="i in tabs" :key="i">
-              <b-card-header>Tab header {{i}}</b-card-header>
-              <b-card-img bottom src="https://picsum.photos/600/200/?image=25" />
+              <div>
+                <my-terminal :terminal="terminal"></my-terminal>
+              </div>
               <b-btn size="sm" variant="danger" class="float-right" @click="()=>closeTab(i)">
                 Close
               </b-btn>
-              <b-card-footer>Tab footer {{i}}</b-card-footer>
             </b-tab>
             <b-nav-item slot="tabs" v-b-modal.comm-config-modal href="#">
               +
@@ -35,6 +35,7 @@
                   <b-form-select class="mb-2 mr-sm-2 mb-sm-0"
                                  v-model="commSelected"
                                  :options="commList"
+                                 size='sm'
                                  id="inlineFormCustomSelectPref">
                     <option slot="first" :value="null">Choose...</option>
                   </b-form-select>
@@ -42,6 +43,7 @@
                   <b-form-select class="mb-2 mr-sm-2 mb-sm-0"
                                  v-model="baudrateSelected"
                                  :options="baudrates"
+                                 size='sm'
                                  id="inlineFormCustomSelectPref">
                     <option slot="first" :value="null">Choose...</option>
                   </b-form-select>
@@ -49,6 +51,7 @@
                   <b-form-select class="mb-2 mr-sm-2 mb-sm-0"
                                  v-model="databitSelected"
                                  :options="databits"
+                                 size='sm'
                                  id="inlineFormCustomSelectPref">
                     <option slot="first" :value="null">Choose...</option>
                   </b-form-select>
@@ -56,6 +59,7 @@
                   <b-form-select class="mb-2 mr-sm-2 mb-sm-0"
                                  v-model="stopbitSelected"
                                  :options="stopbits"
+                                 size='sm'
                                  id="inlineFormCustomSelectPref">
                     <option slot="first" :value="null">Choose...</option>
                   </b-form-select>
@@ -63,6 +67,7 @@
                   <b-form-select class="mb-2 mr-sm-2 mb-sm-0"
                                  v-model="checksumSelected"
                                  :options="checksumbits"
+                                 size='sm'
                                  id="inlineFormCustomSelectPref">
                     <option slot="first" :value="1">Choose...</option>
                   </b-form-select>
@@ -108,39 +113,44 @@
 
 <script>
   import serialport from 'serialport'
+  import Console from './Console'
   
   export default {
     name: 'tabbar',
     data () {
       return {
+        terminal: {
+          pid: 1,
+          name: 'terminal',
+          cols: 400,
+          rows: 400
+        },
         tabs: [],
         tabCounter: 0,
-        name: '',
-        names: [],
-        commSelected: '2',
+        commSelected: '1',
         commList: {},
-        baudrateSelected: '4',
-        baudrates: {
-          '1': '4800',
-          '2': '9600',
-          '3': '38400',
-          '4': '115200'
-        },
-        databitSelected: '1',
-        databits: {
-          '1': '8',
-          '2': '9'
-        },
+        baudrateSelected: '115200',
+        baudrates: [
+          '4800',
+          '9600',
+          '38400',
+          '115200'
+        ],
+        databitSelected: '8',
+        databits: [
+          '8',
+          '9'
+        ],
         stopbitSelected: '1',
-        stopbits: {
-          '1': '1',
-          '2': '0'
-        },
-        checksumSelected: '2',
-        checksumbits: {
-          '1': '1',
-          '2': '0'
-        }
+        stopbits: [
+          '0',
+          '1'
+        ],
+        checksumSelected: '0',
+        checksumbits: [
+          '0',
+          '1'
+        ]
       }
     },
     computed: {
@@ -181,11 +191,23 @@
         })
       },
       onCommOk (evt) {
-        // evt.preventDefault()
-        console.log(this.commList[this.commSelected])
-        this.tabs.push(this.commSelected)
-        this.$refs.commModal.hide()
+        evt.preventDefault()
+        if (!this.commSelected || !this.baudrateSelected ||
+            !this.databitSelected || !this.stopbitSelected ||
+            !this.checksumSelected) {
+          alert('Please choose valid config for serial port')
+          return
+        }
+        if (this.tabs.indexOf(this.commSelected) < 0) {
+          this.tabs.push(this.commSelected)
+          this.$refs.commModal.hide()
+        } else {
+          alert(`It's already opened, choose another one`)
+        }
       }
+    },
+    components: {
+      'my-terminal': Console
     }
   }
 </script>
