@@ -1,5 +1,5 @@
 <template>
-    <div class="console" id="terminal"></div>
+    <div class="console"></div>
 </template>
 
 <script>
@@ -7,6 +7,7 @@ import {Terminal} from 'xterm'
 import * as fit from 'xterm/lib/addons/fit/fit'
 import * as attach from 'xterm/lib/addons/attach/attach'
 import 'xterm/dist/xterm.css'
+// import { setTimeout } from 'timers'
 
 Terminal.applyAddon(fit)
 Terminal.applyAddon(attach)
@@ -39,8 +40,11 @@ export default {
   },
   mounted () {
     console.log('pid : ' + this.terminal.pid + ' is on ready')
-    let terminalContainer = document.getElementById('terminal')
-    this.term = new Terminal()
+    let terminalContainer = document.getElementById('terminal' + this.terminal.pid)
+    this.term = new Terminal({
+      cols: this.terminal.cols,
+      rows: this.terminal.rows
+    })
     this.term.open(terminalContainer)
     // open websocket
     // this.terminalSocket = new WebSocket('ws://127.0.0.1:3000/terminals/')
@@ -48,14 +52,21 @@ export default {
     // this.terminalSocket.onclose = this.closeRealTerminal
     // this.terminalSocket.onerror = this.errorRealTerminal
     // this.term.attach(this.terminalSocket)
+    // this.term.fit()
+    setTimeout(() => { console.log(this.terminal.pid + 'fired'); this.term.fit() }, 0)
+    console.log(this.term.rows, this.term.cols)
     this.term._initialized = true
     this.term.write('Hello from \x1B[1;3;31mxterm.js\x1B[0m $ ')
     console.log('mounted is going on')
   },
   beforeDestroy () {
+    // this.term.detach(this.terminalSocket)
     // this.terminalSocket.close()
-    this.terminalSerialPort.close()
+    // this.terminalSerialPort.close()
     this.term.destroy()
   }
 }
 </script>
+
+<style>
+</style>

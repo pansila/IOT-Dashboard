@@ -5,8 +5,8 @@
         <b-tab no-body title="控制台" active @click="onConsolePage(0)">
           <b-tabs pills card end>
             <b-tab no-body :title="commList[i]" v-for="i in tabs" :key="i">
-              <div>
-                <my-terminal :terminal="terminal"></my-terminal>
+              <div :id="'terminal-container' + i" style="height: 100%">
+                <my-terminal :terminal="terminals[terminals.length - 1]" :id="'terminal' + i"></my-terminal>
               </div>
               <b-btn size="sm" variant="danger" class="float-right" @click="()=>closeTab(i)">
                 Close
@@ -31,44 +31,39 @@
               </b-container> -->
               <form @submit.stop.prevent="handleSubmit">
                 <b-form inline>
-                  <label class="mr-sm-2" for="inlineFormCustomSelectPref">串口</label>
+                  <label class="mr-sm-2">串口</label>
                   <b-form-select class="mb-2 mr-sm-2 mb-sm-0"
                                  v-model="commSelected"
                                  :options="commList"
-                                 size='sm'
-                                 id="inlineFormCustomSelectPref">
+                                 size='sm'>
                     <option slot="first" :value="null">Choose...</option>
                   </b-form-select>
-                  <label class="mr-sm-2" for="inlineFormCustomSelectPref">波特率</label>
+                  <label class="mr-sm-2">波特率</label>
                   <b-form-select class="mb-2 mr-sm-2 mb-sm-0"
                                  v-model="baudrateSelected"
                                  :options="baudrates"
-                                 size='sm'
-                                 id="inlineFormCustomSelectPref">
+                                 size='sm'>
                     <option slot="first" :value="null">Choose...</option>
                   </b-form-select>
-                  <label class="mr-sm-2" for="inlineFormCustomSelectPref">数据位</label>
+                  <label class="mr-sm-2">数据位</label>
                   <b-form-select class="mb-2 mr-sm-2 mb-sm-0"
                                  v-model="databitSelected"
                                  :options="databits"
-                                 size='sm'
-                                 id="inlineFormCustomSelectPref">
+                                 size='sm'>
                     <option slot="first" :value="null">Choose...</option>
                   </b-form-select>
-                  <label class="mr-sm-2" for="inlineFormCustomSelectPref">停止位</label>
+                  <label class="mr-sm-2">停止位</label>
                   <b-form-select class="mb-2 mr-sm-2 mb-sm-0"
                                  v-model="stopbitSelected"
                                  :options="stopbits"
-                                 size='sm'
-                                 id="inlineFormCustomSelectPref">
+                                 size='sm'>
                     <option slot="first" :value="null">Choose...</option>
                   </b-form-select>
-                  <label class="mr-sm-2" for="inlineFormCustomSelectPref">校验位</label>
+                  <label class="mr-sm-2">校验位</label>
                   <b-form-select class="mb-2 mr-sm-2 mb-sm-0"
                                  v-model="checksumSelected"
                                  :options="checksumbits"
-                                 size='sm'
-                                 id="inlineFormCustomSelectPref">
+                                 size='sm'>
                     <option slot="first" :value="1">Choose...</option>
                   </b-form-select>
                 </b-form>
@@ -82,28 +77,36 @@
           </b-tabs>
         </b-tab>
         <b-tab no-body title="调试" @click="onConsolePage(1)">
+          <b-card-header>Comming Soon...</b-card-header>
           <b-card-img bottom src="https://picsum.photos/600/200/?image=25" />
-          <b-card-footer>Picture 2 footer</b-card-footer>
         </b-tab>
         <b-tab no-body title="自动测试" @click="onConsolePage(2)">
+          <b-card-header>Comming Soon...</b-card-header>
           <b-card-img bottom src="https://picsum.photos/600/200/?image=23" />
-          <b-card-footer>Picture 2 footer</b-card-footer>
         </b-tab>
         <b-tab no-body title="文档查询" @click="onConsolePage(3)">
+          <b-card-header>Comming Soon...</b-card-header>
           <b-card-img bottom src="https://picsum.photos/600/200/?image=24" />
-          <b-card-footer>Picture 2 footer</b-card-footer>
         </b-tab>
         <b-tab no-body title="固件下载" @click="onConsolePage(4)">
+          <b-card-header>Comming Soon...</b-card-header>
           <b-card-img bottom src="https://picsum.photos/600/200/?image=26" />
-          <b-card-footer>Picture 2 footer</b-card-footer>
         </b-tab>
         <b-tab no-body title="固件分析" @click="onConsolePage(5)">
+          <b-card-header>Comming Soon...</b-card-header>
           <b-card-img bottom src="https://picsum.photos/600/200/?image=27" />
-          <b-card-footer>Picture 2 footer</b-card-footer>
+        </b-tab>
+        <b-tab no-body title="固件定制" @click="onConsolePage(7)">
+          <b-card-header>Comming Soon...</b-card-header>
+          <b-card-img bottom src="https://picsum.photos/600/200/?image=29" />
         </b-tab>
         <b-tab no-body title="抓包分析" @click="onConsolePage(6)">
+          <b-card-header>Comming Soon...</b-card-header>
           <b-card-img bottom src="https://picsum.photos/600/200/?image=28" />
-          <b-card-footer>Picture 2 footer</b-card-footer>
+        </b-tab>
+        <b-tab no-body title="SDK发布" @click="onConsolePage(7)">
+          <b-card-header>Comming Soon...</b-card-header>
+          <b-card-img bottom src="https://picsum.photos/600/200/?image=30" />
         </b-tab>
       </b-tabs>
     </b-card>
@@ -119,12 +122,7 @@
     name: 'tabbar',
     data () {
       return {
-        terminal: {
-          pid: 1,
-          name: 'terminal',
-          cols: 400,
-          rows: 400
-        },
+        terminals: [],
         tabs: [],
         tabCounter: 0,
         commSelected: '1',
@@ -162,6 +160,7 @@
         for (let i = 0; i < this.tabs.length; i++) {
           if (this.tabs[i] === x) {
             this.tabs.splice(i, 1)
+            this.terminals.splice(i, 1)
           }
         }
       },
@@ -177,7 +176,7 @@
               return
             }
             //
-            ports = [{'comName': 'COM1'}, {'comName': 'COM2'}, {'comName': 'COM3'}]
+            // ports = [{'comName': 'COM1'}, {'comName': 'COM2'}, {'comName': 'COM3'}]
             ports.forEach(port => {
               commList[idx++ + ''] = port.comName
             })
@@ -199,6 +198,12 @@
           return
         }
         if (this.tabs.indexOf(this.commSelected) < 0) {
+          let pid = this.commSelected
+          this.terminals.push({
+            pid: pid
+            // cols: 400,
+            // rows: 100
+          })
           this.tabs.push(this.commSelected)
           this.$refs.commModal.hide()
         } else {
