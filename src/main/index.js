@@ -31,6 +31,9 @@ function createWindow () {
 
   mainWindow.loadURL(winURL)
 
+  mainWindow.on('resize', (e) => {
+    console.log('window resize')
+  })
   mainWindow.on('closed', () => {
     mainWindow = null
   })

@@ -5,7 +5,10 @@
         <b-tab no-body title="控制台" active @click="onConsolePage(0)">
           <b-tabs pills card end>
             <b-tab no-body :title="commList[i]" v-for="i in tabs" :key="i">
-              <my-terminal :terminal="terminals[terminals.length - 1]" :id="'terminal' + i" :style="containerGeom"></my-terminal>
+              <my-terminal
+                :terminal="terminals[terminals.length - 1]"
+                :id="'terminal' + i"
+                :style="containerGeom"></my-terminal>
               <b-btn size="sm" variant="danger" class="float-right" @click="()=>closeTab(i)">
                 Close
               </b-btn>
@@ -108,7 +111,6 @@
         </b-tab>
       </b-tabs>
     </b-card>
-    <router-view></router-view>
   </div>
 </template>
 
@@ -121,8 +123,8 @@
     data () {
       return {
         containerGeom: {
-          width: '100px',
-          height: '100px'
+          // width: '600px',
+          // height: '600px'
         },
         terminals: [],
         tabs: [],
@@ -178,7 +180,7 @@
               return
             }
             //
-            // ports = [{'comName': 'COM1'}, {'comName': 'COM2'}, {'comName': 'COM3'}]
+            ports = [{'comName': 'COM1'}, {'comName': 'COM2'}, {'comName': 'COM3'}]
             ports.forEach(port => {
               commList[idx++ + ''] = port.comName
             })
