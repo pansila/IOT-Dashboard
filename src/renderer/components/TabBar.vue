@@ -5,9 +5,7 @@
         <b-tab no-body title="控制台" active @click="onConsolePage(0)">
           <b-tabs pills card end>
             <b-tab no-body :title="commList[i]" v-for="i in tabs" :key="i">
-              <div :id="'terminal-container' + i" style="height: 100%">
-                <my-terminal :terminal="terminals[terminals.length - 1]" :id="'terminal' + i"></my-terminal>
-              </div>
+              <my-terminal :terminal="terminals[terminals.length - 1]" :id="'terminal' + i" :style="containerGeom"></my-terminal>
               <b-btn size="sm" variant="danger" class="float-right" @click="()=>closeTab(i)">
                 Close
               </b-btn>
@@ -122,6 +120,10 @@
     name: 'tabbar',
     data () {
       return {
+        containerGeom: {
+          width: '100px',
+          height: '100px'
+        },
         terminals: [],
         tabs: [],
         tabCounter: 0,
