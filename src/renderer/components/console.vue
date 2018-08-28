@@ -1,5 +1,8 @@
 <template>
+  <div>
+    <resize-sensor @resize="onResize"></resize-sensor>
     <div class="console"></div>
+  </div>
 </template>
 
 <script>
@@ -7,6 +10,7 @@ import {Terminal} from 'xterm'
 import * as fit from 'xterm/lib/addons/fit/fit'
 import * as attach from 'xterm/lib/addons/attach/attach'
 import 'xterm/dist/xterm.css'
+import resizesensor from './ResizeSensor'
 
 Terminal.applyAddon(fit)
 Terminal.applyAddon(attach)
@@ -80,32 +84,41 @@ export default {
     },
     closeRealTerminal () {
       console.log('close')
+    },
+    onResize (size) {
+      if (this.term) {
+        this.term.fit()
+        return
+      }
+      console.log('pid : ' + this.terminal.pid + ' is on ready')
+      let terminalContainer = document.getElementById('terminal' + this.terminal.pid)
+      this.term = new Terminal({
+        // rendererType: 'dom'
+      })
+      this.term.open(terminalContainer)
+      // open websocket
+      // this.terminalSocket = new WebSocket('ws://127.0.0.1:3000/terminals/')
+      // this.terminalSocket.onopen = this.runRealTerminal
+      // this.terminalSocket.onclose = this.closeRealTerminal
+      // this.terminalSocket.onerror = this.errorRealTerminal
+      // this.term.attach(this.terminalSocket)
+      this.$nextTick(() => this.term.fit())
+      // this.term.fit()
+      this.term._initialized = true
+      this.term.write('Hello from \x1B[1;3;31mxterm.js\x1B[0m $ ')
+      console.log('mounted is going on')
     }
   },
   mounted () {
-    console.log('pid : ' + this.terminal.pid + ' is on ready')
-    let terminalContainer = document.getElementById('terminal' + this.terminal.pid)
-    this.term = new Terminal({
-      rendererType: 'dom'
-    })
-    this.term.open(terminalContainer)
-    // open websocket
-    // this.terminalSocket = new WebSocket('ws://127.0.0.1:3000/terminals/')
-    // this.terminalSocket.onopen = this.runRealTerminal
-    // this.terminalSocket.onclose = this.closeRealTerminal
-    // this.terminalSocket.onerror = this.errorRealTerminal
-    // this.term.attach(this.terminalSocket)
-    this.$nextTick(() => this.term.fit())
-    // this.term.fit()
-    this.term._initialized = true
-    this.term.write('Hello from \x1B[1;3;31mxterm.js\x1B[0m $ ')
-    console.log('mounted is going on')
   },
   beforeDestroy () {
     // this.term.detach(this.terminalSocket)
     // this.terminalSocket.close()
     // this.terminalSerialPort.close()
     this.term.destroy()
+  },
+  components: {
+    'resize-sensor': resizesensor
   }
 }
 </script>

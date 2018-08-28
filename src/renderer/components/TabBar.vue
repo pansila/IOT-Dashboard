@@ -5,12 +5,13 @@
         <b-tab no-body title="控制台" active @click="onConsolePage(0)">
           <b-tabs pills card end>
             <b-tab no-body :title="commList[i]" v-for="i in tabs" :key="i">
+              <resize-sensor @resize="onResize"></resize-sensor>
               <my-terminal
                 :terminal="terminals[terminals.length - 1]"
                 :id="'terminal' + i"
                 :style="containerGeom"></my-terminal>
               <b-btn size="sm" variant="danger" class="float-right" @click="()=>closeTab(i)">
-                Close
+                x
               </b-btn>
             </b-tab>
             <b-nav-item slot="tabs" v-b-modal.comm-config-modal href="#">
@@ -117,6 +118,7 @@
 <script>
   import serialport from 'serialport'
   import Console from './Console'
+  import resizesensor from './ResizeSensor'
   
   export default {
     name: 'tabbar',
@@ -124,7 +126,7 @@
       return {
         containerGeom: {
           // width: '600px',
-          // height: '600px'
+          height: '600px'
         },
         terminals: [],
         tabs: [],
@@ -205,22 +207,28 @@
           let pid = this.commSelected
           this.terminals.push({
             pid: pid
-            // cols: 400,
-            // rows: 100
           })
           this.tabs.push(this.commSelected)
           this.$refs.commModal.hide()
         } else {
           alert(`It's already opened, choose another one`)
         }
+      },
+      onResize (size) {
+        this.containerGeom.width = size.width
+        this.containerGeom.height = size.height
+        console.log(size)
       }
     },
     components: {
-      'my-terminal': Console
+      'my-terminal': Console,
+      'resize-sensor': resizesensor
     }
   }
 </script>
 
 <style>
-  /* CSS */
+/* .console {
+  align-items : stretch
+} */
 </style>
