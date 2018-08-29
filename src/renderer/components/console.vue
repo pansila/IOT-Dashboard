@@ -1,7 +1,6 @@
 <template>
-  <div>
+  <div class="console">
     <resize-sensor @resize="onResize"></resize-sensor>
-    <div class="console"></div>
   </div>
 </template>
 
@@ -14,51 +13,6 @@ import resizesensor from './ResizeSensor'
 
 Terminal.applyAddon(fit)
 Terminal.applyAddon(attach)
-/*
-Terminal.prototype.proposeGeometry = function () {
-  if (!this.element.parentElement) {
-    return null
-  }
-
-  var cellWidth = this._core.renderer.dimensions.actualCellWidth || 9
-  var cellHeight = this._core.renderer.dimensions.actualCellHeight || 17
-  var parentElementStyle = window.getComputedStyle(this.element.parentElement)
-  var parentElementHeight = parseInt(parentElementStyle.getPropertyValue('height'))
-  var parentElementWidth = Math.max(0, parseInt(parentElementStyle.getPropertyValue('width')))
-  var elementStyle = window.getComputedStyle(this.element)
-  var elementPadding = {
-    top: parseInt(elementStyle.getPropertyValue('padding-top')),
-    bottom: parseInt(elementStyle.getPropertyValue('padding-bottom')),
-    right: parseInt(elementStyle.getPropertyValue('padding-right')),
-    left: parseInt(elementStyle.getPropertyValue('padding-left'))
-  }
-  console.log(parentElementHeight, parentElementWidth,
-    this._core.renderer.dimensions.actualCellWidth,
-    this._core.renderer.dimensions.actualCellHeight
-  )
-  var elementPaddingVer = elementPadding.top + elementPadding.bottom
-  var elementPaddingHor = elementPadding.right + elementPadding.left
-  var availableHeight = parentElementHeight - elementPaddingVer
-  var availableWidth = parentElementWidth - elementPaddingHor - this._core.viewport.scrollBarWidth
-  var geometry = {
-    cols: Math.floor(availableWidth / cellWidth),
-    rows: Math.floor(availableHeight / cellHeight)
-  }
-  // This is still sometimes NaN, NaN !?
-  return geometry
-}
-
-Terminal.prototype.fit = function () {
-  var geometry = this.proposeGeometry()
-
-  if (geometry) {
-    if (this.rows !== geometry.rows || this.cols !== geometry.cols) {
-      this._core.renderer.clear()
-      this.resize(geometry.cols, geometry.rows)
-    }
-  }
-}
-*/
 
 export default {
   name: 'Console',
@@ -85,15 +39,11 @@ export default {
     closeRealTerminal () {
       console.log('close')
     },
-    onResize (size) {
-      if (this.term) {
-        this.term.fit()
-        return
-      }
+    setupTerminal () {
       console.log('pid : ' + this.terminal.pid + ' is on ready')
       let terminalContainer = document.getElementById('terminal' + this.terminal.pid)
       this.term = new Terminal({
-        // rendererType: 'dom'
+        rendererType: 'dom'
       })
       this.term.open(terminalContainer)
       // open websocket
@@ -102,14 +52,22 @@ export default {
       // this.terminalSocket.onclose = this.closeRealTerminal
       // this.terminalSocket.onerror = this.errorRealTerminal
       // this.term.attach(this.terminalSocket)
-      this.$nextTick(() => this.term.fit())
-      // this.term.fit()
+      this.term.fit()
       this.term._initialized = true
       this.term.write('Hello from \x1B[1;3;31mxterm.js\x1B[0m $ ')
       console.log('mounted is going on')
+    },
+    onResize (size) {
+      if (this.term) {
+        console.log('resize to fit:', size)
+        this.term.fit()
+      } else {
+        this.setupTerminal()
+      }
     }
   },
   mounted () {
+    // this.setupTerminal()
   },
   beforeDestroy () {
     // this.term.detach(this.terminalSocket)

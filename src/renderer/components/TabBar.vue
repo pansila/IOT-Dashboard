@@ -1,15 +1,17 @@
 <template>
-  <div>
-    <b-card no-body>
+  <div class="min-100 d-flex flex-column">
+    <b-card no-body class="flex-grow-1">
       <b-tabs card>
         <b-tab no-body title="控制台" active @click="onConsolePage(0)">
           <b-tabs pills card end>
             <b-tab no-body :title="commList[i]" v-for="i in tabs" :key="i">
-              <resize-sensor @resize="onResize"></resize-sensor>
-              <my-terminal
-                :terminal="terminals[terminals.length - 1]"
-                :id="'terminal' + i"
-                :style="containerGeom"></my-terminal>
+              <div class="flex-grow-1">
+                <my-terminal
+                  :terminal="terminals[terminals.length - 1]"
+                  :id="'terminal' + i"
+                  :style="containerGeom">
+                </my-terminal>
+              </div>
               <b-btn size="sm" variant="danger" class="float-right" @click="()=>closeTab(i)">
                 x
               </b-btn>
@@ -126,7 +128,7 @@
       return {
         containerGeom: {
           // width: '600px',
-          height: '600px'
+          // height: '600px'
         },
         terminals: [],
         tabs: [],
@@ -213,11 +215,6 @@
         } else {
           alert(`It's already opened, choose another one`)
         }
-      },
-      onResize (size) {
-        this.containerGeom.width = size.width
-        this.containerGeom.height = size.height
-        console.log(size)
       }
     },
     components: {
@@ -228,7 +225,8 @@
 </script>
 
 <style>
-/* .console {
-  align-items : stretch
-} */
+.fill {
+  height : 100%;
+  min-height : 100%;
+}
 </style>
