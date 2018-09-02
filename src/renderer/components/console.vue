@@ -43,7 +43,7 @@ export default {
       console.log('pid : ' + this.terminal.pid + ' is on ready')
       let terminalContainer = document.getElementById('terminal' + this.terminal.pid)
       this.term = new Terminal({
-        rendererType: 'dom'
+        // rendererType: 'dom'
       })
       this.term.open(terminalContainer)
       // open websocket

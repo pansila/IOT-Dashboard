@@ -1,20 +1,23 @@
 <template>
-  <div class="min-100 d-flex flex-column">
-    <b-card no-body class="flex-grow-1">
-      <b-tabs card>
-        <b-tab no-body title="控制台" active @click="onConsolePage(0)">
-          <b-tabs pills card end>
-            <b-tab no-body :title="commList[i]" v-for="i in tabs" :key="i">
-              <div class="flex-grow-1">
+  <div class="h-100">
+    <b-card class="h-100" no-body>
+      <b-tabs class="h-100 my-d-flex" card>
+        <b-tab class="my-d-flex" no-body title="控制台" active @click="onConsolePage(0)">
+          <b-tabs pills card end class="my-d-flex">
+            <b-tab class="my-d-flex" no-body :title="commList[i]" v-for="i in tabs" :key="`console{i}`">
+              <div class="my-d-flex">
                 <my-terminal
+                  class="my-d-flex"
                   :terminal="terminals[terminals.length - 1]"
                   :id="'terminal' + i"
                   :style="containerGeom">
                 </my-terminal>
               </div>
-              <b-btn size="sm" variant="danger" class="float-right" @click="()=>closeTab(i)">
-                x
-              </b-btn>
+              <div>
+                <b-btn size="sm" variant="danger" class="float-right" @click="()=>closeTab(i)">
+                  x
+                </b-btn>
+              </div>
             </b-tab>
             <b-nav-item slot="tabs" v-b-modal.comm-config-modal href="#">
               +
@@ -26,13 +29,6 @@
                      @ok="onCommOk"
                      @shown="onShown"
                      size="lg">
-              <!-- <b-container fluid>
-                <b-row class="mb-1 text-center">
-                  <b-col cols="3"> </b-col>
-                  <b-col>Background</b-col>
-                  <b-col>Text</b-col>
-                </b-row>
-              </b-container> -->
               <form @submit.stop.prevent="handleSubmit">
                 <b-form inline>
                   <label class="mr-sm-2">串口</label>
@@ -74,7 +70,7 @@
               </form>
             </b-modal>
             <!-- Render this if no tabs -->
-            <div slot="empty" class="text-center text-muted">
+            <div slot="empty" class="h-100 text-center text-muted">
               There are no open tabs
               <br> Open a new tab using + button.
             </div>
@@ -225,8 +221,19 @@
 </script>
 
 <style>
-.fill {
-  height : 100%;
-  min-height : 100%;
+.tab-content {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+.tab-content > .active {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+.my-d-flex {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
 }
 </style>

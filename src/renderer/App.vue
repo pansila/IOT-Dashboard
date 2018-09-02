@@ -1,5 +1,5 @@
 <template>
-  <div id="app">
+  <div id="app" class="h-100">
     <router-view></router-view>
   </div>
 </template>
@@ -11,10 +11,7 @@
 </script>
 
 <style>
-/* html, body {
+html, body {
   height: 100%;
-  min-width: 100%;
-  display: flex;
-  flex-direction: column;
-} */
+}
 </style>
