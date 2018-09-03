@@ -10,7 +10,7 @@
                   class="my-d-flex"
                   :terminal="terminals[terminals.length - 1]"
                   :id="'terminal' + i"
-                  :style="containerGeom">
+                  >
                 </my-terminal>
               </div>
               <div style="position: relative;">
@@ -116,16 +116,11 @@
 <script>
   import serialport from 'serialport'
   import Console from './Console'
-  import resizesensor from './ResizeSensor'
   
   export default {
     name: 'tabbar',
     data () {
       return {
-        containerGeom: {
-          // width: '600px',
-          // height: '600px'
-        },
         terminals: [],
         tabs: [],
         tabCounter: 0,
@@ -180,7 +175,7 @@
               return
             }
             //
-            ports = [{'comName': 'COM1'}, {'comName': 'COM2'}, {'comName': 'COM3'}]
+            // ports = [{'comName': 'COM1'}, {'comName': 'COM2'}, {'comName': 'COM3'}]
             ports.forEach(port => {
               commList[idx++ + ''] = port.comName
             })
@@ -204,7 +199,8 @@
         if (this.tabs.indexOf(this.commSelected) < 0) {
           let pid = this.commSelected
           this.terminals.push({
-            pid: pid
+            pid: pid,
+            comm: this.commList[this.commSelected]
           })
           this.tabs.push(this.commSelected)
           this.$refs.commModal.hide()
@@ -214,8 +210,7 @@
       }
     },
     components: {
-      'my-terminal': Console,
-      'resize-sensor': resizesensor
+      'my-terminal': Console
     }
   }
 </script>

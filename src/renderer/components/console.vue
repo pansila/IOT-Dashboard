@@ -10,6 +10,7 @@ import * as fit from 'xterm/lib/addons/fit/fit'
 import * as attach from 'xterm/lib/addons/attach/attach'
 import 'xterm/dist/xterm.css'
 import resizesensor from './ResizeSensor'
+import SerialPort from 'serialport'
 
 Terminal.applyAddon(fit)
 Terminal.applyAddon(attach)
@@ -26,7 +27,8 @@ export default {
     return {
       term: null,
       // terminalSocket: null
-      terminalSerialPort: null
+      terminalSerialPort: null,
+      serialport: null
     }
   },
   methods: {
@@ -43,7 +45,7 @@ export default {
       console.log('pid : ' + this.terminal.pid + ' is on ready')
       let terminalContainer = document.getElementById('terminal' + this.terminal.pid)
       this.term = new Terminal({
-        // rendererType: 'dom'
+        rendererType: 'dom'
       })
       this.term.open(terminalContainer)
       // open websocket
@@ -54,8 +56,34 @@ export default {
       // this.term.attach(this.terminalSocket)
       this.term.fit()
       this.term._initialized = true
-      this.term.write('Hello from \x1B[1;3;31mxterm.js\x1B[0m $ ')
-      console.log('mounted is going on')
+      this.term.on('key', (data) => {
+        this.term.write(data)
+        this.serialport.write(data)
+      })
+      console.log(this.terminal.comm + ' mounted is going on')
+    },
+    setupSerialport () {
+      SerialPort.list((err, ports) => {
+        if (err) {
+          console.log(err)
+          return
+        }
+        ports.forEach(port => {
+          if (this.terminal.comm === port.comName) {
+            const Readline = SerialPort.parsers.Readline
+            const port = new SerialPort(this.terminal.comm, {
+              baudRate: 115200
+            })
+            const parser = new Readline()
+            port.pipe(parser)
+            parser.on('data', (data) => {
+              this.term.writeln(data)
+            })
+
+            this.serialport = port
+          }
+        })
+      })
     },
     onResize (size) {
       if (this.term) {
@@ -63,6 +91,7 @@ export default {
         this.term.fit()
       } else {
         this.setupTerminal()
+        this.setupSerialport()
       }
     }
   },
@@ -73,6 +102,7 @@ export default {
     // this.term.detach(this.terminalSocket)
     // this.terminalSocket.close()
     // this.terminalSerialPort.close()
+    this.serialport.close()
     this.term.destroy()
   },
   components: {
