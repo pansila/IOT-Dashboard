@@ -13,5 +13,6 @@
 <style>
 html, body {
   height: 100%;
+  line-height: 0.8;
 }
 </style>

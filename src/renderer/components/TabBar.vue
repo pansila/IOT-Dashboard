@@ -4,7 +4,7 @@
       <b-tabs class="h-100 my-d-flex" card>
         <b-tab class="my-d-flex" no-body title="控制台" active @click="onConsolePage(0)">
           <b-tabs pills card end class="my-d-flex">
-            <b-tab class="my-d-flex" no-body :title="commList[i]" v-for="i in tabs" :key="`console{i}`">
+            <b-tab no-body :title="commList[i]" v-for="i in tabs" :key="`console${i}`">
               <div class="my-d-flex">
                 <my-terminal
                   class="my-d-flex"
@@ -13,8 +13,8 @@
                   :style="containerGeom">
                 </my-terminal>
               </div>
-              <div>
-                <b-btn size="sm" variant="danger" class="float-right" @click="()=>closeTab(i)">
+              <div style="position: relative;">
+                <b-btn size="sm" variant="danger" class="my-close-btn" @click="()=>closeTab(i)">
                   x
                 </b-btn>
               </div>
@@ -235,5 +235,9 @@
   display: flex;
   flex-direction: column;
   flex-grow: 1;
+}
+.my-close-btn {
+  position: absolute;
+  right: 0;
 }
 </style>
