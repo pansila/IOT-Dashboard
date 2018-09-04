@@ -174,8 +174,8 @@
                 commList[idx++ + ''] = port.comName
               })
               resolve(commList)
-            }, err => reject(err))
-            .catch(err => reject(err))
+            })
+            .catch(reject)
         )
       },
       checkComm (comm) {
@@ -196,8 +196,8 @@
         this.getComm()
           .then(commList => {
             this.commList = commList
-          }, err => console.log(err))
-          .catch(err => alert(err))
+          })
+          .catch(alert)
       },
       onCommOk (evt) {
         evt.preventDefault()

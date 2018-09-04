@@ -81,8 +81,8 @@ export default {
                 })
               }
             })
-          }, err => reject(err))
-          .catch(err => reject(err))
+          })
+          .catch(reject)
       })
     },
     onResize (size) {
@@ -102,8 +102,8 @@ export default {
           parser.on('data', data => {
             this.term.writeln(data)
           })
-        }, err => alert(err))
-        .catch(err => alert(err))
+        })
+        .catch(alert)
     }
   },
   mounted () {
