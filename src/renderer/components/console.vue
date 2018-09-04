@@ -56,43 +56,54 @@ export default {
       // this.term.attach(this.terminalSocket)
       this.term.fit()
       this.term._initialized = true
-      this.term.on('key', (data) => {
+      this.term.on('key', data => {
         this.term.write(data)
         this.serialport.write(data)
       })
       console.log(this.terminal.comm + ' mounted is going on')
     },
     setupSerialport () {
-      SerialPort.list((err, ports) => {
-        if (err) {
-          console.log(err)
-          return
-        }
-        ports.forEach(port => {
-          if (this.terminal.comm === port.comName) {
-            const Readline = SerialPort.parsers.Readline
-            const port = new SerialPort(this.terminal.comm, {
-              baudRate: 115200
+      return new Promise((resolve, reject) => {
+        SerialPort.list()
+          .then(ports => {
+            ports.forEach(port => {
+              if (this.terminal.comm === port.comName) {
+                const port = new SerialPort(this.terminal.comm, {
+                  autoOpen: false, // to catch opening error
+                  baudRate: 115200
+                })
+                port.open(err => {
+                  if (err === null) {
+                    resolve(port)
+                  } else {
+                    reject(err)
+                  }
+                })
+              }
             })
-            const parser = new Readline()
-            port.pipe(parser)
-            parser.on('data', (data) => {
-              this.term.writeln(data)
-            })
-
-            this.serialport = port
-          }
-        })
+          }, err => reject(err))
+          .catch(err => reject(err))
       })
     },
     onResize (size) {
       if (this.term) {
         console.log('resize to fit:', size)
         this.term.fit()
-      } else {
-        this.setupTerminal()
-        this.setupSerialport()
+        return
       }
+
+      this.setupSerialport()
+        .then(port => {
+          this.serialport = port
+          this.setupTerminal()
+
+          const parser = new SerialPort.parsers.Readline()
+          port.pipe(parser)
+          parser.on('data', data => {
+            this.term.writeln(data)
+          })
+        }, err => alert(err))
+        .catch(err => alert(err))
     }
   },
   mounted () {
@@ -102,8 +113,8 @@ export default {
     // this.term.detach(this.terminalSocket)
     // this.terminalSocket.close()
     // this.terminalSerialPort.close()
-    this.serialport.close()
-    this.term.destroy()
+    if (this.serialport) this.serialport.close()
+    if (this.term) this.term.destroy()
   },
   components: {
     'resize-sensor': resizesensor

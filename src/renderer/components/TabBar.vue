@@ -114,7 +114,7 @@
 </template>
 
 <script>
-  import serialport from 'serialport'
+  import SerialPort from 'serialport'
   import Console from './Console'
   
   export default {
@@ -163,30 +163,43 @@
           }
         }
       },
-      getCOMM () {
+      getComm () {
         return new Promise((resolve, reject) =>
-          serialport.list((err, ports) => {
-            let commList = {}
-            let idx = 1
-            // console.log(JSON.stringify(ports))
-            if (err) {
-              reject(err)
-              console.log(err)
-              return
-            }
-            //
-            // ports = [{'comName': 'COM1'}, {'comName': 'COM2'}, {'comName': 'COM3'}]
-            ports.forEach(port => {
-              commList[idx++ + ''] = port.comName
-            })
-            resolve(commList)
-          })
+          SerialPort.list()
+            .then(ports => {
+              let commList = {}
+              let idx = 1
+              // ports = [{'comName': 'COM1'}, {'comName': 'COM2'}, {'comName': 'COM3'}]
+              ports.forEach(port => {
+                commList[idx++ + ''] = port.comName
+              })
+              resolve(commList)
+            }, err => reject(err))
+            .catch(err => reject(err))
         )
       },
-      onShown () {
-        this.getCOMM().then(commList => {
-          this.commList = commList
+      checkComm (comm) {
+        return new Promise((resolve, reject) => {
+          const port = new SerialPort(comm, {
+            autoOpen: false // to catch opening error
+          })
+          port.open(err => {
+            if (err === null) {
+              console.log('sdfsd')
+              port.close()
+              resolve()
+            } else {
+              reject(err)
+            }
+          })
         })
+      },
+      onShown () {
+        this.getComm()
+          .then(commList => {
+            this.commList = commList
+          }, err => console.log(err))
+          .catch(err => alert(err))
       },
       onCommOk (evt) {
         evt.preventDefault()
@@ -197,13 +210,14 @@
           return
         }
         if (this.tabs.indexOf(this.commSelected) < 0) {
-          let pid = this.commSelected
-          this.terminals.push({
-            pid: pid,
-            comm: this.commList[this.commSelected]
-          })
-          this.tabs.push(this.commSelected)
-          this.$refs.commModal.hide()
+          this.checkComm(this.commList[this.commSelected]).then(() => {
+            this.terminals.push({
+              pid: this.commSelected,
+              comm: this.commList[this.commSelected]
+            })
+            this.tabs.push(this.commSelected)
+            this.$refs.commModal.hide()
+          }, alert)
         } else {
           alert(`It's already opened, choose another one`)
         }
