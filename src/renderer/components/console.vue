@@ -11,7 +11,7 @@ import * as fit from 'xterm/lib/addons/fit/fit'
 import 'xterm/dist/xterm.css'
 import resizesensor from './ResizeSensor'
 import SerialPort from 'serialport'
-// import HighLighter from '../../utils/HighLighter'
+import Highlighter from '../../utils/Highlighter'
 
 Terminal.applyAddon(fit)
 // Terminal.applyAddon(attach)
@@ -29,7 +29,12 @@ export default {
       term: null,
       // terminalSocket: null
       terminalSerialPort: null,
-      serialport: null
+      serialport: null,
+      highlightOptions: {
+        highlightOptions: [],
+        caseSensitive: false,
+        defaultStyle: 'red'
+      }
     }
   },
   methods: {
@@ -102,10 +107,14 @@ export default {
           this.setupTerminal()
 
           const parser = new SerialPort.parsers.Readline()
-          port.pipe(parser)
+          const highlighter = Highlighter(this.highlightOptions)
           port.on('close', e => { this.serialport = null; console.log('Close', e) })
           port.on('error', console.log)
-          parser.on('data', data => {
+          // parser.on('data', data => {
+          //   this.term.writeln(data)
+          // })
+          // port.pipe(parser)
+          port.pipe(parser).pipe(highlighter).on('data', data => {
             this.term.writeln(data)
           })
         })

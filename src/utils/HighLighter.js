@@ -1,5 +1,5 @@
-import fs from 'fs'
 import ansi from 'ansi-styles'
+import through2 from 'through2'
 
 // Receives 'color1.color2...'.
 // Returns {open:'ansi open codes', close:'ansi close codes'}
@@ -9,6 +9,7 @@ function buildAnsiColor (colorsStr) {
   let ansiClose = ''
   for (let i = 0; i < colorsArray.length; i++) {
     let colorStr = colorsArray[i]
+    console.log(ansi.red.open)
     ansiOpen += eval('ansi.' + colorStr + '.open')
     ansiClose = eval('ansi.' + colorStr + '.close') + ansiClose
   }
@@ -113,25 +114,6 @@ function highlightLine (line, highlightOptions) {
   return result.join('')
 }
 
-function buildLiner (writer, eventEmitter, highlightOptions) {
-  let liner = import('./liner')()
-
-  liner.on('readable', function () {
-    while (true) {
-      let line = liner.read()
-      if (!line) {
-        break
-      }
-      writer.write(highlightLine(line, highlightOptions) + '\n')
-    }
-  })
-  liner.on('end', function () {
-    eventEmitter.emit('finished')
-  })
-
-  return liner
-}
-
 function buildColorFromText (highlightColorArg, defaultStyle) {
   let colorsText = highlightColorArg.split('.')
   let colorStr = defaultStyle
@@ -164,7 +146,7 @@ function buildColorFromText (highlightColorArg, defaultStyle) {
  * }
  *
  */
-function highlight (options, writer, eventEmitter) {
+function highlight (options) {
   // Transform highlight pattern into valid regexp.
   for (let i = 0; i < options.highlightOptions.length; i++) {
     let highlightOption = options.highlightOptions[i]
@@ -203,20 +185,16 @@ function highlight (options, writer, eventEmitter) {
   }
 
   // console.log(JSON.stringify(options.highlightOptions, null, 2))
-
-  let liner = buildLiner(writer, eventEmitter, options.highlightOptions)
-  if (options.fileName) {
-    let source = fs.createReadStream(options.fileName)
-    source.on('error', function (event) {
-      writer.write('Could not open file ' + options.fileName)
-      eventEmitter.emit('failed')
-    })
-    source.pipe(liner)
-  } else {
-    process.stdin.resume()
-    process.stdin.setEncoding('utf8')
-    process.stdin.pipe(liner)
+  function write (line, _, next) {
+    this.push(highlightLine(line, options.highlightOptions))
+    next()
   }
+
+  function end (done) {
+    done()
+  }
+
+  return through2.obj(write, end)
 }
 
 // https://developer.mozilla.org/en/docs/Web/JavaScript/Guide/Regular_Expressions
