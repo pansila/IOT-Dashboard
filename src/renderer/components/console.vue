@@ -11,7 +11,7 @@ import * as fit from 'xterm/lib/addons/fit/fit'
 import 'xterm/dist/xterm.css'
 import resizesensor from './ResizeSensor'
 import SerialPort from 'serialport'
-import Highlighter from '../../utils/Highlighter'
+import Highlighter from '@utils/Highlighter'
 
 Terminal.applyAddon(fit)
 // Terminal.applyAddon(attach)
@@ -51,7 +51,7 @@ export default {
       console.log('pid : ' + this.terminal.pid + ' is on ready')
       let terminalContainer = document.getElementById('terminal' + this.terminal.pid)
       this.term = new Terminal({
-        rendererType: 'dom'
+        // rendererType: 'dom'
       })
       this.term.open(terminalContainer)
       // open websocket
