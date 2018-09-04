@@ -185,9 +185,7 @@
           })
           port.open(err => {
             if (err === null) {
-              console.log('sdfsd')
-              port.close()
-              resolve()
+              port.close(err => { if (err === null) resolve() })
             } else {
               reject(err)
             }
