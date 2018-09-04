@@ -108,12 +108,9 @@ export default {
 
           const parser = new SerialPort.parsers.Readline()
           const highlighter = Highlighter(this.highlightOptions)
+
           port.on('close', e => { this.serialport = null; console.log('Close', e) })
           port.on('error', console.log)
-          // parser.on('data', data => {
-          //   this.term.writeln(data)
-          // })
-          // port.pipe(parser)
           port.pipe(parser).pipe(highlighter).on('data', data => {
             this.term.writeln(data)
           })
