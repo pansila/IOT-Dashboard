@@ -61,8 +61,8 @@
                   </b-form-select>
                   <label class="mr-sm-2">校验位</label>
                   <b-form-select class="mb-2 mr-sm-2 mb-sm-0"
-                                 v-model="checksumSelected"
-                                 :options="checksumbits"
+                                 v-model="paritySelected"
+                                 :options="parity"
                                  size='sm'>
                     <option slot="first" :value="1">Choose...</option>
                   </b-form-select>
@@ -143,8 +143,8 @@
           '0',
           '1'
         ],
-        checksumSelected: '0',
-        checksumbits: [
+        paritySelected: '0',
+        parity: [
           '0',
           '1'
         ]
@@ -203,7 +203,7 @@
         evt.preventDefault()
         if (!this.commSelected || !this.baudrateSelected ||
             !this.databitSelected || !this.stopbitSelected ||
-            !this.checksumSelected) {
+            !this.paritySelected) {
           alert('Please choose valid config for serial port')
           return
         }
@@ -211,7 +211,11 @@
           this.checkComm(this.commList[this.commSelected]).then(() => {
             this.terminals.push({
               pid: this.commSelected,
-              comm: this.commList[this.commSelected]
+              comm: this.commList[this.commSelected],
+              baudrate: this.baudrateSelected,
+              databits: this.databitSelected,
+              stopbits: this.stopbitSelected,
+              parity: this.paritySelected
             })
             this.tabs.push(this.commSelected)
             this.$refs.commModal.hide()

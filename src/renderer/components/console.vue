@@ -7,13 +7,14 @@
 <script>
 import {Terminal} from 'xterm'
 import * as fit from 'xterm/lib/addons/fit/fit'
-import * as attach from 'xterm/lib/addons/attach/attach'
+// import * as attach from 'xterm/lib/addons/attach/attach'
 import 'xterm/dist/xterm.css'
 import resizesensor from './ResizeSensor'
 import SerialPort from 'serialport'
+// import HighLighter from '../../utils/HighLighter'
 
 Terminal.applyAddon(fit)
-Terminal.applyAddon(attach)
+// Terminal.applyAddon(attach)
 
 export default {
   name: 'Console',
@@ -56,7 +57,10 @@ export default {
       // this.term.attach(this.terminalSocket)
       this.term.fit()
       this.term._initialized = true
-      this.term.on('key', data => {
+      this.term.on('key', (data, ev) => {
+        // if (ev.keyCode === 8) {
+        //   this.term.write()
+        // }
         this.term.write(data)
         this.serialport.write(data)
       })
@@ -99,6 +103,8 @@ export default {
 
           const parser = new SerialPort.parsers.Readline()
           port.pipe(parser)
+          port.on('close', e => { this.serialport = null; console.log('Close', e) })
+          port.on('error', console.log)
           parser.on('data', data => {
             this.term.writeln(data)
           })

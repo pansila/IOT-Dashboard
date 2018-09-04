@@ -56,6 +56,7 @@
     }
   },
   "dependencies": {
+    "ansi-styles": "^3.2.1",
     "axios": "^0.16.1",
     "bootstrap-vue": "^2.0.0-rc.11",
     "serialport": "^6.2.2",
