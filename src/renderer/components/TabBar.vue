@@ -147,7 +147,8 @@
         parity: [
           '0',
           '1'
-        ]
+        ],
+        timestampPrefix: true
       }
     },
     computed: {
@@ -215,7 +216,8 @@
               baudrate: this.baudrateSelected,
               databits: this.databitSelected,
               stopbits: this.stopbitSelected,
-              parity: this.paritySelected
+              parity: this.paritySelected,
+              timestampPrefix: this.timestampPrefix
             })
             this.tabs.push(this.commSelected)
             this.$refs.commModal.hide()

@@ -12,6 +12,8 @@ import 'xterm/dist/xterm.css'
 import resizesensor from './ResizeSensor'
 import SerialPort from 'serialport'
 import Highlighter from '../../utils/Highlighter'
+import {TimestampPrefix} from '../../utils/Common.js'
+import {PassThrough} from 'stream'
 
 Terminal.applyAddon(fit)
 // Terminal.applyAddon(attach)
@@ -108,10 +110,11 @@ export default {
 
           const parser = new SerialPort.parsers.Readline()
           const highlighter = Highlighter(this.highlightOptions)
+          const timestampPrefix = this.terminal.timestampPrefix ? TimestampPrefix() : new PassThrough()
 
           port.on('close', e => { this.serialport = null; console.log('Close', e) })
           port.on('error', console.log)
-          port.pipe(parser).pipe(highlighter).on('data', data => {
+          port.pipe(parser).pipe(highlighter).pipe(timestampPrefix).on('data', data => {
             this.term.writeln(data)
           })
         })
