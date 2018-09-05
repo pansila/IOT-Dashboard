@@ -73,6 +73,16 @@
             <div slot="empty" class="h-100 text-center text-muted">
               There are no open tabs
               <br> Open a new tab using + button.
+              <div class="dropdown show">
+                <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  Dropdown link
+                </a>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                  <a class="dropdown-item" href="#">Action</a>
+                  <a class="dropdown-item" href="#">Another action</a>
+                  <a class="dropdown-item" href="#">Something else here</a>
+                </div>
+              </div>
             </div>
           </b-tabs>
         </b-tab>
@@ -147,7 +157,8 @@
         parity: [
           '0',
           '1'
-        ]
+        ],
+        timestampPrefix: true
       }
     },
     computed: {
@@ -215,7 +226,8 @@
               baudrate: this.baudrateSelected,
               databits: this.databitSelected,
               stopbits: this.stopbitSelected,
-              parity: this.paritySelected
+              parity: this.paritySelected,
+              timestampPrefix: this.timestampPrefix
             })
             this.tabs.push(this.commSelected)
             this.$refs.commModal.hide()
