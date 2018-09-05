@@ -10,12 +10,15 @@ function PadMilliseconds (v) {
   return v
 }
 
+function write (line, _, next) {
+  let d = new Date()
+  this.push(d.toTimeString().slice(0, 8) + '.' + PadMilliseconds(d.getMilliseconds()) + ': ' + line)
+  next()
+}
+
 function TimestampPrefix () {
-  return through2.obj(function (line, _, next) {
-    let d = new Date()
-    this.push(d.toTimeString().slice(0, 8) + '.' + PadMilliseconds(d.getMilliseconds()) + ': ' + line)
-    next()
-  }, done => done())
+  // return through2.obj(write, done => done())
+  return through2(write, done => done())
 }
 
 export {TimestampPrefix}
