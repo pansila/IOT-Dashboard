@@ -79,7 +79,7 @@ export default {
       console.log('pid : ' + this.terminal.pid + ' is on ready')
       let terminalContainer = document.getElementById('terminal' + this.terminal.pid)
       this.term = new Terminal({
-        rendererType: 'dom'
+        // rendererType: 'dom'
       })
       this.term.open(terminalContainer)
       // open websocket
@@ -139,8 +139,8 @@ export default {
           this.setupTerminal()
 
           const parser = new SerialPort.parsers.Readline()
-          const highlighter = Highlighter(this.highlightOptions)
-          const timestampPrefix = this.terminal.timestampPrefix ? TimestampPrefix() : new PassThrough()
+          const highlighter = this.terminal.highlightEnabled ? Highlighter(this.highlightOptions) : new PassThrough()
+          const timestampPrefix = this.terminal.timestampEnabled ? TimestampPrefix() : new PassThrough()
 
           port.on('close', e => { this.serialport = null; console.log('Close', e) })
           port.on('error', console.log)

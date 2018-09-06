@@ -29,83 +29,127 @@
                      @ok="onCommOk"
                      @shown="onShown"
                      size="lg">
-              <div>
+              <form @submit.stop.prevent="handleSubmit">
                 <b-form-group label="连接方式">
                   <b-form-radio-group id="radios2" v-model="connectionType" name="connectionType">
                     <b-form-radio value="local">本地连接</b-form-radio>
                     <b-form-radio value="remote">远程连接</b-form-radio>
                   </b-form-radio-group>
                 </b-form-group>
-              </div>
-              <form @submit.stop.prevent="handleSubmit">
-                <b-form inline>
-                  <label class="mr-sm-2">串口</label>
-                  <b-form-select class="mb-2 mr-sm-2 mb-sm-0"
-                                 v-model="commSelected"
-                                 :options="commList"
-                                 size='sm'>
-                  </b-form-select>
-                  <label class="mr-sm-2">波特率</label>
-                  <b-form-select class="mb-2 mr-sm-2 mb-sm-0"
-                                 v-model="baudrateSelected"
-                                 :options="baudrates"
-                                 size='sm'>
-                  </b-form-select>
-                  <label class="mr-sm-2">数据位</label>
-                  <b-form-select class="mb-2 mr-sm-2 mb-sm-0"
-                                 v-model="databitSelected"
-                                 :options="databits"
-                                 size='sm'>
-                  </b-form-select>
-                  <label class="mr-sm-2">停止位</label>
-                  <b-form-select class="mb-2 mr-sm-2 mb-sm-0"
-                                 v-model="stopbitSelected"
-                                 :options="stopbits"
-                                 size='sm'>
-                  </b-form-select>
-                  <label class="mr-sm-2">校验位</label>
-                  <b-form-select class="mb-2 mr-sm-2 mb-sm-0"
-                                 v-model="paritySelected"
-                                 :options="parity"
-                                 size='sm'>
-                  </b-form-select>
-                </b-form>
-                <b-form inline>
-                  <b-form-checkbox class="mb-2 mr-sm-2 mb-sm-0"
-                                 v-model="timestampEnabled"
-                                 value="true"
-                                 size='sm'>
-                    时间戳
-                  </b-form-checkbox>
-                  <b-form-checkbox class="mb-2 mr-sm-2 mb-sm-0"
-                                 v-model="highlightEnabled"
-                                 value="true"
-                                 size='sm'>
-                    消息高亮
-                  </b-form-checkbox>
-                  <b-form-checkbox class="mb-2 mr-sm-2 mb-sm-0"
-                                 v-model="sharedOverWebsocket"
-                                 value="true"
-                                 size='sm'>
-                    远程共享该串口
-                  </b-form-checkbox>
-                </b-form>
+                <b-card v-show="connectionType === 'remote'">
+                  <b-container fluid>
+                    <b-row>
+                      <b-col sm="3"><label>远端串口地址</label></b-col>
+                      <b-col sm="9">
+                        <b-form-input
+                          size="sm"
+                          v-model="remoteIP"
+                          type="text"
+                          :state="IPState"
+                          aria-describedby="IPFeedback"
+                          placeholder="192.168.1.1">
+                        </b-form-input>
+                        <b-form-invalid-feedback id="IPFeedback">
+                          IP地址不正确
+                        </b-form-invalid-feedback>
+                      </b-col>
+                      <b-col sm="3"><label>远端串口端口</label></b-col>
+                      <b-col sm="9">
+                        <b-form-input
+                          size="sm"
+                          v-model="remotePort"
+                          type="text"
+                          :state="portState"
+                          aria-describedby="PortFeedback"
+                          placeholder="8848">
+                        </b-form-input>
+                        <b-form-invalid-feedback id="PortFeedback">
+                          IP端口不正确
+                        </b-form-invalid-feedback>
+                      </b-col>
+                      <b-col sm="3"><label>远端串口名称</label></b-col>
+                      <b-col sm="9">
+                        <b-form-input
+                          size="sm"
+                          v-model="remoteComm"
+                          type="text"
+                          :formatter="commFormat"
+                          placeholder="COM1">
+                        </b-form-input>
+                      </b-col>
+                    </b-row>
+                  </b-container>
+                </b-card>
+                <b-card v-show="connectionType === 'local'">
+                  <b-form inline>
+                    <label class="mr-sm-2">串口</label>
+                    <b-form-select class="mb-2 mr-sm-2 mb-sm-0"
+                                   v-model="commSelected"
+                                   :options="commList"
+                                   size='sm'>
+                    </b-form-select>
+                    <label class="mr-sm-2">波特率</label>
+                    <b-form-select class="mb-2 mr-sm-2 mb-sm-0"
+                                   v-model="baudrateSelected"
+                                   :options="baudrates"
+                                   size='sm'>
+                    </b-form-select>
+                    <label class="mr-sm-2">数据位</label>
+                    <b-form-select class="mb-2 mr-sm-2 mb-sm-0"
+                                   v-model="databitSelected"
+                                   :options="databits"
+                                   size='sm'>
+                    </b-form-select>
+                    <label class="mr-sm-2">停止位</label>
+                    <b-form-select class="mb-2 mr-sm-2 mb-sm-0"
+                                   v-model="stopbitSelected"
+                                   :options="stopbits"
+                                   size='sm'>
+                    </b-form-select>
+                    <label class="mr-sm-2">校验位</label>
+                    <b-form-select class="mb-2 mr-sm-2 mb-sm-0"
+                                   v-model="paritySelected"
+                                   :options="parity"
+                                   size='sm'>
+                    </b-form-select>
+                  </b-form>
+                </b-card>
+                <br/>
+                <b-form-checkbox v-model="advancedComm" class="mb-2 mr-sm-2 mb-sm-0">显示高级选项</b-form-checkbox>
+                <b-card v-show="advancedComm === true">
+                  <b-form inline>
+                    <b-form-checkbox class="mb-2 mr-sm-2 mb-sm-0"
+                                   v-model="timestampEnabled"
+                                   value="true"
+                                   size='sm'>
+                      时间戳
+                    </b-form-checkbox>
+                    <b-form-checkbox class="mb-2 mr-sm-2 mb-sm-0"
+                                   v-model="highlightEnabled"
+                                   value="true"
+                                   size='sm'>
+                      消息高亮
+                    </b-form-checkbox>
+                    <b-input-group size="sm" v-show="connectionType === 'local'">
+                      <b-input-group-prepend>
+                          <b-form-checkbox
+                                 class="mb-2 mr-sm-2 mb-sm-0"
+                                 size="sm"
+                                 aria-label="Checkbox for following text input"
+                                 v-model="sharedOverWebsocket">
+                            远程共享该串口
+                          </b-form-checkbox>
+                      </b-input-group-prepend>
+                      <b-form-input type="text" placeholder="共享名称(默认当前串口号)" v-show="sharedOverWebsocket === true"/>
+                    </b-input-group>
+                  </b-form>
+                </b-card>
               </form>
             </b-modal>
             <!-- Render this if no tabs -->
-            <div slot="empty" class="h-100 text-center text-muted">
+            <div slot="empty" style="margin: auto" class="h-100 text-center text-muted">
               There are no open tabs
               <br> Open a new tab using + button.
-              <div class="dropdown show">
-                <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  Dropdown link
-                </a>
-                <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-                  <a class="dropdown-item" href="#">Action</a>
-                  <a class="dropdown-item" href="#">Another action</a>
-                  <a class="dropdown-item" href="#">Something else here</a>
-                </div>
-              </div>
             </div>
           </b-tabs>
         </b-tab>
@@ -151,6 +195,10 @@
     data () {
       return {
         connectionType: 'local',
+        advancedComm: false,
+        remoteIP: null,
+        remotePort: null,
+        remoteComm: null,
         terminals: [],
         tabs: [],
         tabCounter: 0,
@@ -191,8 +239,21 @@
         sharedOverWebsocket: false
       }
     },
-    // computed: {
-    // },
+    computed: {
+      IPState () {
+        if (!this.remoteIP) return true
+        let ip = this.remoteIP.split('.')
+        if (!ip || ip.length !== 4 || ip[3] === '' ||
+            !/^\d+$/.test(ip[0] + ip[1] + ip[2] + ip[3])) {
+          return false
+        }
+        return true
+      },
+      portState () {
+        if (!this.remotePort) return true
+        return /^\d+$/.test(this.remotePort)
+      }
+    },
     // mounted () {
     // },
     methods: {
@@ -205,6 +266,9 @@
             this.terminals.splice(i, 1)
           }
         }
+      },
+      commFormat (value, event) {
+        return value.toUpperCase()
       },
       getComm () {
         return new Promise((resolve, reject) =>
