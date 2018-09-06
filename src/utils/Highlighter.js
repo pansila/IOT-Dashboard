@@ -1,6 +1,54 @@
 import ansi from 'ansi-styles'
 import through2 from 'through2'
 
+/*
+const DEFAULT_HIGHLIGHT_COLOR = 'red' // If no color is specified, use red.
+const DEFAULT_HIGHLIGHT_COLOR_PARAM = 'DEFAULT_HIGHLIGHT_COLOR_PARAM'
+const NO_DASH_START_REGEX = /^[^-].*$/ // Text that does not start with a dash.
+const DASH_START_REGEX = /^-.*$/
+
+const validModifiers = {
+  'ci': true, // case insensitive
+  'cs': true, // case sensitive
+  'esc': true, // escape regexp characters
+  'wl': true // whole line
+}
+
+const validColors = {
+  'black': true,
+  'red': true,
+  'green': true,
+  'yellow': true,
+  'blue': true,
+  'magenta': true,
+  'cyan': true,
+  'white': true,
+  'gray': true
+}
+
+const validBgColors = {
+  'bgBlack': true,
+  'bgRed': true,
+  'bgGreen': true,
+  'bgYellow': true,
+  'bgBlue': true,
+  'bgMagenta': true,
+  'bgCyan': true,
+  'bgWhite': true
+}
+
+const validStyles = {
+  'reset': true,
+  'bold': true,
+  'dim': true,
+  'italic': true,
+  'underline': true,
+  'inverse': true,
+  'hidden': true,
+  'strikethrough': true
+}
+*/
+
 // Receives 'color1.color2...'.
 // Returns {open:'ansi open codes', close:'ansi close codes'}
 function buildAnsiColor (colorsStr) {
@@ -9,9 +57,9 @@ function buildAnsiColor (colorsStr) {
   let ansiClose = ''
   for (let i = 0; i < colorsArray.length; i++) {
     let colorStr = colorsArray[i]
-    console.log(ansi.red.open)
-    ansiOpen += eval('ansi.' + colorStr + '.open')
-    ansiClose = eval('ansi.' + colorStr + '.close') + ansiClose
+    ansiOpen += ansi[colorStr].open
+    ansiClose = ansi[colorStr].close + ansiClose
+    // console.log(ansiOpen, ansiClose)
   }
   return {open: ansiOpen, close: ansiClose}
 }
@@ -177,6 +225,7 @@ function highlight (options) {
         }
         patternListStr += patternStr
       }
+      console.log(patternListStr)
       highlightOption.patternRegex = new RegExp(patternListStr, 'g' + caseOption)
 
       // Cache color
@@ -190,11 +239,7 @@ function highlight (options) {
     next()
   }
 
-  function end (done) {
-    done()
-  }
-
-  return through2.obj(write, end)
+  return through2.obj(write, done => done())
 }
 
 // https://developer.mozilla.org/en/docs/Web/JavaScript/Guide/Regular_Expressions

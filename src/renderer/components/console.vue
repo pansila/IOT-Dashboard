@@ -33,9 +33,35 @@ export default {
       terminalSerialPort: null,
       serialport: null,
       highlightOptions: {
-        highlightOptions: [],
+        highlightOptions: [
+          {
+            colorText: 'red.bold',
+            patternArray: ['error', 'fail', 'failed'],
+            modifiers: {}
+          },
+          {
+            colorText: 'yellow.bold',
+            patternArray: ['warn', 'warning'],
+            modifiers: {}
+          },
+          {
+            colorText: 'blue',
+            patternArray: ['succeed', 'succeeded', 'successfully'],
+            modifiers: {}
+          },
+          {
+            colorText: 'green',
+            patternArray: ['\\bstart', '\\bstop', '\\bcreate', '\\bcreated', '\\bcomplete', '\\bcompleted', '\\bfinish', '\\bfinished', '\\bend'],
+            modifiers: {}
+          },
+          {
+            colorText: 'bgBlue',
+            patternArray: ['\\d+(\\.\\d+){3}', '[0-9a-fA-F]{2}(:[0-9a-fA-F]{2}){3,5}', '0x[0-9a-fA-F]+'],
+            modifiers: {}
+          }
+        ],
         caseSensitive: false,
-        defaultStyle: 'red'
+        defaultStyle: 'white'
       }
     }
   },
@@ -53,7 +79,7 @@ export default {
       console.log('pid : ' + this.terminal.pid + ' is on ready')
       let terminalContainer = document.getElementById('terminal' + this.terminal.pid)
       this.term = new Terminal({
-        // rendererType: 'dom'
+        rendererType: 'dom'
       })
       this.term.open(terminalContainer)
       // open websocket
