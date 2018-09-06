@@ -31,6 +31,8 @@ function createWindow () {
 
   mainWindow.loadURL(winURL)
 
+  mainWindow.maximize()
+
   mainWindow.on('resize', (e) => {
     console.log('window resize')
   })

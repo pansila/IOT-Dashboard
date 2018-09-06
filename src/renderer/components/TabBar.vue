@@ -5,14 +5,24 @@
         <b-tab class="my-d-flex" no-body title="控制台" active @click="onConsolePage(0)">
           <b-tabs pills card end class="my-d-flex">
             <b-tab no-body :title="commList[i]" v-for="i in tabs" :key="`console${i}`">
-              <div class="my-d-flex">
-                <my-terminal
-                  class="my-d-flex"
-                  :terminal="terminals[terminals.length - 1]"
-                  :id="'terminal' + i"
-                  >
-                </my-terminal>
-              </div>
+              <b-container fluid class="my-d-flex">
+                <b-row>
+                  <b-col>
+                    <my-terminal
+                      class="my-d-flex"
+                      :terminal="terminals[terminals.length - 1]"
+                      :id="'terminal' + i"
+                      >
+                    </my-terminal>
+                  </b-col>
+                  <b-col cols="1">
+                    <b-card>
+                      <b-card-header>Comming Soon...</b-card-header>
+                      <b-card-img bottom src="https://picsum.photos/600/200/?image=35" />
+                    </b-card>
+                  </b-col>
+                </b-row>
+              </b-container>
               <div style="position: relative;">
                 <b-btn size="sm" variant="danger" class="my-close-btn" @click="()=>closeTab(i)">
                   x
@@ -31,17 +41,18 @@
                      size="lg">
               <form @submit.stop.prevent="handleSubmit">
                 <b-form-group label="连接方式">
-                  <b-form-radio-group id="radios2" v-model="connectionType" name="connectionType">
+                  <b-form-radio-group v-model="connectionType" name="connectionType">
                     <b-form-radio value="local">本地连接</b-form-radio>
                     <b-form-radio value="remote">远程连接</b-form-radio>
                   </b-form-radio-group>
                 </b-form-group>
-                <b-card v-show="connectionType === 'remote'">
+                <b-card no-body v-show="connectionType === 'remote'">
                   <b-container fluid>
                     <b-row>
-                      <b-col sm="3"><label>远端串口地址</label></b-col>
+                      <b-col sm="3" class="mt-2"><label>远端串口地址</label></b-col>
                       <b-col sm="9">
                         <b-form-input
+                          class="mb-2 mt-2"
                           size="sm"
                           v-model="remoteIP"
                           type="text"
@@ -56,6 +67,7 @@
                       <b-col sm="3"><label>远端串口端口</label></b-col>
                       <b-col sm="9">
                         <b-form-input
+                          class="mb-2"
                           size="sm"
                           v-model="remotePort"
                           type="text"
@@ -70,6 +82,7 @@
                       <b-col sm="3"><label>远端串口名称</label></b-col>
                       <b-col sm="9">
                         <b-form-input
+                          class="mb-2"
                           size="sm"
                           v-model="remoteComm"
                           type="text"
@@ -116,9 +129,9 @@
                 </b-card>
                 <br/>
                 <b-form-checkbox v-model="advancedComm" class="mb-2 mr-sm-2 mb-sm-0">显示高级选项</b-form-checkbox>
-                <b-card v-show="advancedComm === true">
+                <b-card no-body v-show="advancedComm === true">
                   <b-form inline>
-                    <b-form-checkbox class="mb-2 mr-sm-2 mb-sm-0"
+                    <b-form-checkbox class="ml-2 mb-2 mr-sm-2 mb-sm-0"
                                    v-model="timestampEnabled"
                                    value="true"
                                    size='sm'>
