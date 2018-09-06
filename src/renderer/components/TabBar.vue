@@ -29,6 +29,14 @@
                      @ok="onCommOk"
                      @shown="onShown"
                      size="lg">
+              <div>
+                <b-form-group label="连接方式">
+                  <b-form-radio-group id="radios2" v-model="connectionType" name="connectionType">
+                    <b-form-radio value="local">本地连接</b-form-radio>
+                    <b-form-radio value="remote">远程连接</b-form-radio>
+                  </b-form-radio-group>
+                </b-form-group>
+              </div>
               <form @submit.stop.prevent="handleSubmit">
                 <b-form inline>
                   <label class="mr-sm-2">串口</label>
@@ -36,36 +44,51 @@
                                  v-model="commSelected"
                                  :options="commList"
                                  size='sm'>
-                    <option slot="first" :value="null">Choose...</option>
                   </b-form-select>
                   <label class="mr-sm-2">波特率</label>
                   <b-form-select class="mb-2 mr-sm-2 mb-sm-0"
                                  v-model="baudrateSelected"
                                  :options="baudrates"
                                  size='sm'>
-                    <option slot="first" :value="null">Choose...</option>
                   </b-form-select>
                   <label class="mr-sm-2">数据位</label>
                   <b-form-select class="mb-2 mr-sm-2 mb-sm-0"
                                  v-model="databitSelected"
                                  :options="databits"
                                  size='sm'>
-                    <option slot="first" :value="null">Choose...</option>
                   </b-form-select>
                   <label class="mr-sm-2">停止位</label>
                   <b-form-select class="mb-2 mr-sm-2 mb-sm-0"
                                  v-model="stopbitSelected"
                                  :options="stopbits"
                                  size='sm'>
-                    <option slot="first" :value="null">Choose...</option>
                   </b-form-select>
                   <label class="mr-sm-2">校验位</label>
                   <b-form-select class="mb-2 mr-sm-2 mb-sm-0"
                                  v-model="paritySelected"
                                  :options="parity"
                                  size='sm'>
-                    <option slot="first" :value="1">Choose...</option>
                   </b-form-select>
+                </b-form>
+                <b-form inline>
+                  <b-form-checkbox class="mb-2 mr-sm-2 mb-sm-0"
+                                 v-model="timestampEnabled"
+                                 value="true"
+                                 size='sm'>
+                    时间戳
+                  </b-form-checkbox>
+                  <b-form-checkbox class="mb-2 mr-sm-2 mb-sm-0"
+                                 v-model="highlightEnabled"
+                                 value="true"
+                                 size='sm'>
+                    消息高亮
+                  </b-form-checkbox>
+                  <b-form-checkbox class="mb-2 mr-sm-2 mb-sm-0"
+                                 v-model="sharedOverWebsocket"
+                                 value="true"
+                                 size='sm'>
+                    远程共享该串口
+                  </b-form-checkbox>
                 </b-form>
               </form>
             </b-modal>
@@ -114,10 +137,6 @@
           <b-card-header>Comming Soon...</b-card-header>
           <b-card-img bottom src="https://picsum.photos/600/200/?image=28" />
         </b-tab>
-        <b-tab no-body title="SDK发布" @click="onConsolePage(7)">
-          <b-card-header>Comming Soon...</b-card-header>
-          <b-card-img bottom src="https://picsum.photos/600/200/?image=30" />
-        </b-tab>
       </b-tabs>
     </b-card>
   </div>
@@ -131,38 +150,51 @@
     name: 'tabbar',
     data () {
       return {
+        connectionType: 'local',
         terminals: [],
         tabs: [],
         tabCounter: 0,
         commSelected: '1',
         commList: {},
-        baudrateSelected: '115200',
+        baudrateSelected: 115200,
         baudrates: [
-          '4800',
-          '9600',
-          '38400',
-          '115200'
+          4800,
+          9600,
+          14400,
+          19200,
+          38400,
+          57600,
+          115200
         ],
-        databitSelected: '8',
+        databitSelected: 8,
         databits: [
-          '8',
-          '9'
+          8,
+          7,
+          6,
+          5
         ],
-        stopbitSelected: '1',
+        stopbitSelected: 1,
         stopbits: [
-          '0',
-          '1'
+          1,
+          2
         ],
-        paritySelected: '0',
+        paritySelected: 'none',
         parity: [
-          '0',
-          '1'
+          'none',
+          'even',
+          'mark',
+          'odd',
+          'space'
         ],
-        timestampPrefix: true
+        timestampEnabled: true,
+        highlightEnabled: true,
+        sharedOverWebsocket: false
       }
     },
-    computed: {
-    },
+    // computed: {
+    // },
+    // mounted () {
+    // },
     methods: {
       onConsolePage (idx) {
       },
@@ -223,9 +255,9 @@
             this.terminals.push({
               pid: this.commSelected,
               comm: this.commList[this.commSelected],
-              baudrate: this.baudrateSelected,
-              databits: this.databitSelected,
-              stopbits: this.stopbitSelected,
+              baudRate: this.baudrateSelected,
+              dataBits: this.databitSelected,
+              stopBits: this.stopbitSelected,
               parity: this.paritySelected,
               timestampPrefix: this.timestampPrefix
             })

@@ -1,4 +1,5 @@
 import through2 from 'through2'
+import ansi from 'ansi-styles'
 
 function PadMilliseconds (v) {
   if (v < 10) {
@@ -12,7 +13,10 @@ function PadMilliseconds (v) {
 
 function write (line, _, next) {
   let d = new Date()
-  this.push(d.toTimeString().slice(0, 8) + '.' + PadMilliseconds(d.getMilliseconds()) + ': ' + line)
+  let timestamp = d.toTimeString().slice(0, 8) + '.' + PadMilliseconds(d.getMilliseconds()) + ': '
+  timestamp = ansi.bold.open + ansi.grey.open + timestamp + ansi.grey.close + ansi.bold.close + line
+  // console.log(timestamp)
+  this.push(timestamp)
   next()
 }
 

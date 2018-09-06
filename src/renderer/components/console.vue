@@ -45,12 +45,12 @@ export default {
             modifiers: {}
           },
           {
-            colorText: 'blue',
+            colorText: 'blue.bold',
             patternArray: ['succeed', 'succeeded', 'successfully'],
             modifiers: {}
           },
           {
-            colorText: 'green',
+            colorText: 'green.bold',
             patternArray: ['\\bstart', '\\bstop', '\\bcreate', '\\bcreated', '\\bcomplete', '\\bcompleted', '\\bfinish', '\\bfinished', '\\bend'],
             modifiers: {}
           },
@@ -105,9 +105,13 @@ export default {
           .then(ports => {
             ports.forEach(port => {
               if (this.terminal.comm === port.comName) {
+                console.log(this.terminal)
                 const port = new SerialPort(this.terminal.comm, {
                   autoOpen: false, // to catch opening error
-                  baudRate: 115200
+                  baudRate: this.terminal.baudRate,
+                  dataBits: this.terminal.dataBits,
+                  stopBits: this.terminal.stopBits,
+                  parity: this.terminal.parity
                 })
                 port.open(err => {
                   if (err === null) {
