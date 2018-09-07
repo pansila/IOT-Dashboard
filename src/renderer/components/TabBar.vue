@@ -15,8 +15,8 @@
                       >
                     </my-terminal>
                   </b-col>
-                  <b-col cols="3" class="my-d-flex-grid p-0">
-                    <b-card>
+                  <b-col cols="3" class="p-0">
+                    <b-card no-body>
                       <b-card-header>Comming Soon...</b-card-header>
                       <b-card-img bottom src="https://picsum.photos/600/200/?image=35" />
                     </b-card>

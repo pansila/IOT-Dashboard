@@ -30,8 +30,8 @@ export default {
     return {
       term: null,
       // terminalSocket: null
-      terminalSerialPort: null,
       serialport: null,
+      input: '',
       highlightOptions: {
         highlightOptions: [
           {
@@ -91,11 +91,31 @@ export default {
       this.term.fit()
       this.term._initialized = true
       this.term.on('key', (data, ev) => {
-        // if (ev.keyCode === 8) {
-        //   this.term.write()
-        // }
-        this.term.write(data)
-        this.serialport.write(data)
+        const printable =
+          !ev.altKey && !ev.altGraphKey && !ev.ctrlKey && !ev.metaKey
+        if (
+          ev.code === 'ArrowUp' ||
+          ev.code === 'ArrowDown' ||
+          ev.code === 'ArrowLeft' ||
+          ev.code === 'ArrowRight'
+        ) {
+          return
+        }
+        if (ev.keyCode === 13) {
+          // this.term._repl.process(this.input)
+          this.input += data
+          this.term.write(data)
+          this.serialport.write(this.input)
+          this.input = ''
+        } else if (ev.keyCode === 8) {
+          if (this.term._core.buffer.x > 0) {
+            this.term.write('\b \b')
+            this.input = this.input.slice(0, -1)
+          }
+        } else if (printable) {
+          this.input += data
+          this.term.write(data)
+        }
       })
       console.log(this.terminal.comm + ' mounted is going on')
     },
@@ -157,7 +177,6 @@ export default {
   beforeDestroy () {
     // this.term.detach(this.terminalSocket)
     // this.terminalSocket.close()
-    // this.terminalSerialPort.close()
     if (this.serialport) this.serialport.close()
     if (this.term) this.term.destroy()
   },
