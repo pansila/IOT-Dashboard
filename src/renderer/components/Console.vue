@@ -32,6 +32,10 @@ export default {
       // terminalSocket: null
       serialport: null,
       input: '',
+      history: [],
+      historyIdx: 0,
+      lookupHistory: false,
+      // promptOffset: 0,
       highlightOptions: {
         highlightOptions: [
           {
@@ -91,18 +95,40 @@ export default {
       this.term.fit()
       this.term._initialized = true
       this.term.on('key', (data, ev) => {
-        const printable =
-          !ev.altKey && !ev.altGraphKey && !ev.ctrlKey && !ev.metaKey
-        if (
-          ev.code === 'ArrowUp' ||
-          ev.code === 'ArrowDown' ||
-          ev.code === 'ArrowLeft' ||
-          ev.code === 'ArrowRight'
-        ) {
+        const printable = !ev.altKey && !ev.altGraphKey && !ev.ctrlKey && !ev.metaKey
+
+        if (ev.code === 'ArrowUp' ||
+            ev.code === 'ArrowDown') {
+          if (!this.lookupHistory && this.historyIdx === this.history.length - 1 && this.input &&
+              this.history[this.history.length - 1] !== this.input) {
+            this.history.push(this.input)
+            this.historyIdx++
+          }
+          if (ev.code === 'ArrowUp' && this.historyIdx > 0) {
+            this.historyIdx--
+          }
+          if (ev.code === 'ArrowDown' && this.historyIdx !== this.history.length - 1) {
+            this.historyIdx++
+          }
+          this.lookupHistory = true
+          this.xterm.write('\b'.repeat(this.input.length) +
+                           ' '.repeat(this.input.length) +
+                           '\b'.repeat(this.input.length))
+          this.input = this.history[this.historyIdx]
+          this.xterm(this.input)
+        }
+
+        if (ev.code === 'ArrowLeft' ||
+            ev.code === 'ArrowRight') {
           return
         }
+
         if (ev.keyCode === 13) {
-          // this.term._repl.process(this.input)
+          if (this.input && this.history[this.history.length - 1] !== this.input) {
+            this.history.push(this.input)
+            this.historyIdx = this.history.length - 1
+          }
+          this.lookupHistory = false
           this.input += data
           this.term.write(data)
           this.serialport.write(this.input)
@@ -110,7 +136,7 @@ export default {
         } else if (ev.keyCode === 8) {
           if (this.term._core.buffer.x > 0) {
             this.term.write('\b \b')
-            this.input = this.input.slice(0, -1)
+            this.input = this.input.splice(-1)
           }
         } else if (printable) {
           this.input += data
@@ -161,6 +187,7 @@ export default {
           const parser = new SerialPort.parsers.Readline()
           const highlighter = this.terminal.highlightEnabled ? Highlighter(this.highlightOptions) : new PassThrough()
           const timestampPrefix = this.terminal.timestampEnabled ? TimestampPrefix() : new PassThrough()
+          // this.promptOffset = this.terminal.timestampEnabled ? 14 : 2
 
           port.on('close', e => { this.serialport = null; console.log('Close', e) })
           port.on('error', console.log)

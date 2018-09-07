@@ -25,7 +25,7 @@
                 type="text"
                 :state="IPState"
                 aria-describedby="IPFeedback"
-                placeholder="192.168.1.1">
+                placeholder="例: 192.168.1.1">
               </b-form-input>
               <b-form-invalid-feedback id="IPFeedback">
                 IP地址不正确
@@ -40,7 +40,7 @@
                 type="text"
                 :state="portState"
                 aria-describedby="PortFeedback"
-                placeholder="8848">
+                placeholder="例: 8848">
               </b-form-input>
               <b-form-invalid-feedback id="PortFeedback">
                 IP端口不正确
@@ -54,7 +54,7 @@
                 v-model="remoteComm"
                 type="text"
                 :formatter="commFormat"
-                placeholder="COM1">
+                placeholder="例: COM1">
               </b-form-input>
             </b-col>
           </b-row>
