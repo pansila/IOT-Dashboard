@@ -225,7 +225,7 @@ function highlight (options) {
         }
         patternListStr += patternStr
       }
-      console.log(patternListStr)
+      // console.log(patternListStr)
       highlightOption.patternRegex = new RegExp(patternListStr, 'g' + caseOption)
 
       // Cache color

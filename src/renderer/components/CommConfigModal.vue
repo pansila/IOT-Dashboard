@@ -180,9 +180,9 @@
         sharedOverWebsocket: false
       }
     },
-    mounted () {
-      console.log(this.$store.state.Comm)
-    },
+    // mounted () {
+    //   console.log(this.$store.state.Comm)
+    // },
     computed: {
       ...mapState({
         terminals: state => state.Comm.terminals,

@@ -5,9 +5,9 @@
         <b-tab class="my-d-flex" no-body title="控制台" active>
           <b-tabs pills card end class="my-d-flex">
             <b-tab no-body :title="commList[i]" v-for="i in tabs" :key="`console${i}`">
-              <b-container fluid class="my-d-flex">
-                <b-row>
-                  <b-col>
+              <b-container fluid class="my-d-flex-grid">
+                <b-row class="flex-grow-1">
+                  <b-col class="my-d-flex-grid p-0">
                     <my-terminal
                       class="my-d-flex"
                       :terminal="terminals[terminals.length - 1]"
@@ -15,12 +15,12 @@
                       >
                     </my-terminal>
                   </b-col>
-                  <!-- <b-col cols="3">
+                  <b-col cols="3" class="my-d-flex-grid p-0">
                     <b-card>
                       <b-card-header>Comming Soon...</b-card-header>
                       <b-card-img bottom src="https://picsum.photos/600/200/?image=35" />
                     </b-card>
-                  </b-col> -->
+                  </b-col>
                 </b-row>
               </b-container>
               <div style="position: relative;">
@@ -125,6 +125,10 @@
 .tab-content > .active {
   display: flex;
   flex-direction: column;
+  flex-grow: 1;
+}
+.my-d-flex-grid {
+  display: flex;
   flex-grow: 1;
 }
 .my-d-flex {

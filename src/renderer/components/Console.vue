@@ -128,7 +128,7 @@ export default {
     },
     onResize (size) {
       if (this.term) {
-        console.log('resize to fit:', size)
+        // console.log('resize to fit:', size)
         this.term.fit()
         return
       }
@@ -138,7 +138,6 @@ export default {
           this.serialport = port
           this.setupTerminal()
 
-          console.log(this.terminal.highlightEnabled, this.terminal.timestampEnabled)
           const parser = new SerialPort.parsers.Readline()
           const highlighter = this.terminal.highlightEnabled ? Highlighter(this.highlightOptions) : new PassThrough()
           const timestampPrefix = this.terminal.timestampEnabled ? TimestampPrefix() : new PassThrough()
