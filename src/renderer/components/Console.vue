@@ -79,7 +79,7 @@ export default {
       console.log('pid : ' + this.terminal.pid + ' is on ready')
       let terminalContainer = document.getElementById('terminal' + this.terminal.pid)
       this.term = new Terminal({
-        // rendererType: 'dom'
+        rendererType: 'dom'
       })
       this.term.open(terminalContainer)
       // open websocket
@@ -105,7 +105,7 @@ export default {
           .then(ports => {
             ports.forEach(port => {
               if (this.terminal.comm === port.comName) {
-                console.log(this.terminal)
+                // console.log(this.terminal)
                 const port = new SerialPort(this.terminal.comm, {
                   autoOpen: false, // to catch opening error
                   baudRate: this.terminal.baudRate,
@@ -138,6 +138,7 @@ export default {
           this.serialport = port
           this.setupTerminal()
 
+          console.log(this.terminal.highlightEnabled, this.terminal.timestampEnabled)
           const parser = new SerialPort.parsers.Readline()
           const highlighter = this.terminal.highlightEnabled ? Highlighter(this.highlightOptions) : new PassThrough()
           const timestampPrefix = this.terminal.timestampEnabled ? TimestampPrefix() : new PassThrough()

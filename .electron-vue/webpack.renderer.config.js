@@ -136,6 +136,7 @@ let rendererConfig = {
       '@': path.join(__dirname, '../src/renderer'),
       '@components': path.join(__dirname, '../src/renderer/components'),
       '@utils': path.join(__dirname, '../src/utils'),
+      '@store': path.join(__dirname, '../src/renderer/store'),
       'vue$': 'vue/dist/vue.esm.js'
     },
     extensions: ['.js', '.vue', '.json', '.css', '.node']
