@@ -111,15 +111,15 @@ export default {
             this.historyIdx++
           }
           this.lookupHistory = true
-          this.xterm.write('\b'.repeat(this.input.length) +
+          this.term.write('\b'.repeat(this.input.length) +
                            ' '.repeat(this.input.length) +
                            '\b'.repeat(this.input.length))
           this.input = this.history[this.historyIdx]
-          this.xterm(this.input)
+          this.term.write(this.input)
+          return
         }
 
-        if (ev.code === 'ArrowLeft' ||
-            ev.code === 'ArrowRight') {
+        if (ev.code === 'ArrowLeft' || ev.code === 'ArrowRight') {
           return
         }
 
@@ -130,13 +130,13 @@ export default {
           }
           this.lookupHistory = false
           this.input += data
-          this.term.write(data)
+          // this.term.write(data)
           this.serialport.write(this.input)
           this.input = ''
         } else if (ev.keyCode === 8) {
           if (this.term._core.buffer.x > 0) {
             this.term.write('\b \b')
-            this.input = this.input.splice(-1)
+            this.input = this.input.slice(0, -1)
           }
         } else if (printable) {
           this.input += data
