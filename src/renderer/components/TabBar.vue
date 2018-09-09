@@ -17,7 +17,7 @@
                   </b-col>
                   <b-col cols="3" class="p-0">
                     <b-card no-body>
-                      <b-card-header>Comming Soon...</b-card-header>
+                      <b-card-header>Coming Soon...</b-card-header>
                       <b-card-img bottom src="https://picsum.photos/600/200/?image=35" />
                     </b-card>
                   </b-col>
@@ -44,31 +44,31 @@
           </b-tabs>
         </b-tab>
         <b-tab no-body title="调试">
-          <b-card-header>Comming Soon...</b-card-header>
+          <b-card-header>Coming Soon...</b-card-header>
           <b-card-img bottom src="https://picsum.photos/600/200/?image=25" />
         </b-tab>
         <b-tab no-body title="自动测试">
-          <b-card-header>Comming Soon...</b-card-header>
+          <b-card-header>Coming Soon...</b-card-header>
           <b-card-img bottom src="https://picsum.photos/600/200/?image=23" />
         </b-tab>
         <b-tab no-body title="文档查询">
-          <b-card-header>Comming Soon...</b-card-header>
+          <b-card-header>Coming Soon...</b-card-header>
           <b-card-img bottom src="https://picsum.photos/600/200/?image=24" />
         </b-tab>
         <b-tab no-body title="固件下载">
-          <b-card-header>Comming Soon...</b-card-header>
+          <b-card-header>Coming Soon...</b-card-header>
           <b-card-img bottom src="https://picsum.photos/600/200/?image=26" />
         </b-tab>
         <b-tab no-body title="固件分析">
-          <b-card-header>Comming Soon...</b-card-header>
+          <b-card-header>Coming Soon...</b-card-header>
           <b-card-img bottom src="https://picsum.photos/600/200/?image=27" />
         </b-tab>
         <b-tab no-body title="固件定制">
-          <b-card-header>Comming Soon...</b-card-header>
+          <b-card-header>Coming Soon...</b-card-header>
           <b-card-img bottom src="https://picsum.photos/600/200/?image=29" />
         </b-tab>
         <b-tab no-body title="抓包分析">
-          <b-card-header>Comming Soon...</b-card-header>
+          <b-card-header>Coming Soon...</b-card-header>
           <b-card-img bottom src="https://picsum.photos/600/200/?image=28" />
         </b-tab>
       </b-tabs>

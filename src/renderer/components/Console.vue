@@ -12,7 +12,7 @@ import 'xterm/dist/xterm.css'
 import resizesensor from './ResizeSensor'
 import SerialPort from 'serialport'
 import Highlighter from '@utils/Highlighter'
-import {TimestampPrefix} from '@utils/Common.js'
+import {TimestampPrefix, ImplicitCarriage} from '@utils/Common.js'
 import {PassThrough} from 'stream'
 
 Terminal.applyAddon(fit)
@@ -97,8 +97,12 @@ export default {
       this.term.on('key', (data, ev) => {
         const printable = !ev.altKey && !ev.altGraphKey && !ev.ctrlKey && !ev.metaKey
 
-        if (ev.code === 'ArrowUp' ||
-            ev.code === 'ArrowDown') {
+        if (ev.code === 'ArrowUp' || ev.code === 'ArrowDown') {
+          if (!this.historyEnabled) {
+            this.serialport.write(data)
+            return
+          }
+
           if (!this.lookupHistory && this.historyIdx === this.history.length - 1 && this.input &&
               this.history[this.history.length - 1] !== this.input) {
             this.history.push(this.input)
@@ -124,13 +128,15 @@ export default {
         }
 
         if (ev.keyCode === 13) {
-          if (this.input && this.history[this.history.length - 1] !== this.input) {
-            this.history.push(this.input)
+          if (this.historyEnabled) {
+            if (this.input && this.history[this.history.length - 1] !== this.input) {
+              this.history.push(this.input)
+            }
             this.historyIdx = this.history.length - 1
+            this.lookupHistory = false
           }
-          this.lookupHistory = false
           this.input += data
-          // this.term.write(data)
+          // this.term.write('\r\n')
           this.serialport.write(this.input)
           this.input = ''
         } else if (ev.keyCode === 8) {
@@ -184,16 +190,21 @@ export default {
           this.serialport = port
           this.setupTerminal()
 
-          const parser = new SerialPort.parsers.Readline()
+          const parser = new SerialPort.parsers.Readline({ delimiter: '\r\n' })
           const highlighter = this.terminal.highlightEnabled ? Highlighter(this.highlightOptions) : new PassThrough()
           const timestampPrefix = this.terminal.timestampEnabled ? TimestampPrefix() : new PassThrough()
+          const implicitCarriage = this.terminal.implicitCarriageEnabled ? ImplicitCarriage() : new PassThrough()
           // this.promptOffset = this.terminal.timestampEnabled ? 14 : 2
 
           port.on('close', e => { this.serialport = null; console.log('Close', e) })
-          port.on('error', console.log)
-          port.pipe(parser).pipe(highlighter).pipe(timestampPrefix).on('data', data => {
-            this.term.writeln(data)
-          })
+          port.on('error', alert)
+          port.pipe(parser)
+            .pipe(highlighter)
+            .pipe(timestampPrefix)
+            .pipe(implicitCarriage).on('data', data => {
+              console.log(Array.from(data).map(ch => ch.charCodeAt()))
+              this.term.write(data)
+            })
         })
         .catch(alert)
     }

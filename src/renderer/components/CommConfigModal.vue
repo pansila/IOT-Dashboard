@@ -177,6 +177,8 @@
         paritySelected: 'none',
         timestampEnabled: true,
         highlightEnabled: true,
+        implicitCarriageEnabled: true,
+        historyEnabled: false,
         sharedOverWebsocket: false
       }
     },
@@ -264,7 +266,9 @@
               stopBits: this.stopbitSelected,
               parity: this.paritySelected,
               timestampEnabled: this.timestampEnabled,
-              highlightEnabled: this.highlightEnabled
+              highlightEnabled: this.highlightEnabled,
+              implicitCarriageEnabled: this.implicitCarriageEnabled,
+              historyEnabled: this.historyEnabled
             })
             this.$store.commit('ADD_TAB', idx)
             this.$refs.commModal.hide() // TODO
