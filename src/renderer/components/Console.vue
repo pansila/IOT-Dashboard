@@ -33,7 +33,7 @@ export default {
       // terminalSocket: null
       serialport: null,
       input: '',
-      history: [],
+      history: [''],
       historyIdx: 0,
       lookupHistory: false,
       // promptOffset: 0,
@@ -99,7 +99,7 @@ export default {
         const printable = !ev.altKey && !ev.altGraphKey && !ev.ctrlKey && !ev.metaKey
 
         if (ev.code === 'ArrowUp' || ev.code === 'ArrowDown') {
-          if (!this.terminal.historyEnabled) {
+          if (!this.terminal.localHistoryEnabled) {
             this.serialport.write(data)
             return
           }
@@ -139,7 +139,7 @@ export default {
         }
 
         if (ev.keyCode === 13) {
-          if (this.terminal.historyEnabled) {
+          if (this.terminal.localHistoryEnabled) {
             if (this.input && this.history[this.history.length - 1] !== this.input) {
               this.history.push(this.input)
             }
@@ -151,7 +151,8 @@ export default {
                             ' '.repeat(this.input.length) +
                             '\b'.repeat(this.input.length))
           } else {
-            this.serialport.write('\r\n')
+            this.serialport.write('\r')
+            // this.term.write('\r')
           }
           this.input += data
           // console.log(Array.from(this.input).map(ch => ch.charCodeAt()))

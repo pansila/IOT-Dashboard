@@ -180,7 +180,7 @@
         implicitCarriageEnabled: true,
         implicitLineFeedEnabled: true,
         localEchoEnabled: true,
-        historyEnabled: true,
+        localHistoryEnabled: true,
         sharedOverWebsocket: false
       }
     },
@@ -272,7 +272,7 @@
               implicitCarriageEnabled: this.implicitCarriageEnabled,
               implicitLineFeedEnabled: this.implicitLineFeedEnabled,
               localEchoEnabled: this.localEchoEnabled,
-              historyEnabled: this.historyEnabled
+              localHistoryEnabled: this.localHistoryEnabled
             })
             this.$store.commit('ADD_TAB', idx)
             this.$refs.commModal.hide() // TODO
