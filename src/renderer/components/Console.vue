@@ -99,7 +99,7 @@ export default {
         const printable = !ev.altKey && !ev.altGraphKey && !ev.ctrlKey && !ev.metaKey
 
         if (ev.code === 'ArrowUp' || ev.code === 'ArrowDown') {
-          if (!this.historyEnabled) {
+          if (!this.terminal.historyEnabled) {
             this.serialport.write(data)
             return
           }
@@ -109,18 +109,28 @@ export default {
             this.history.push(this.input)
             this.historyIdx++
           }
-          if (ev.code === 'ArrowUp' && this.historyIdx > 0) {
-            this.historyIdx--
-          }
-          if (ev.code === 'ArrowDown' && this.historyIdx !== this.history.length - 1) {
-            this.historyIdx++
+          if (ev.code === 'ArrowDown') {
+            if (this.historyIdx !== this.history.length - 1) {
+              this.historyIdx++
+            } else if (this.input !== '') {
+              this.term.write('\b'.repeat(this.input.length) +
+                              ' '.repeat(this.input.length) +
+                              '\b'.repeat(this.input.length))
+              this.input = ''
+              return
+            } else {
+              return
+            }
           }
           this.lookupHistory = true
           this.term.write('\b'.repeat(this.input.length) +
-                           ' '.repeat(this.input.length) +
-                           '\b'.repeat(this.input.length))
+                          ' '.repeat(this.input.length) +
+                          '\b'.repeat(this.input.length))
           this.input = this.history[this.historyIdx]
           this.term.write(this.input)
+          if (ev.code === 'ArrowUp' && this.historyIdx > 0) {
+            this.historyIdx--
+          }
           return
         }
 
@@ -129,7 +139,7 @@ export default {
         }
 
         if (ev.keyCode === 13) {
-          if (this.historyEnabled) {
+          if (this.terminal.historyEnabled) {
             if (this.input && this.history[this.history.length - 1] !== this.input) {
               this.history.push(this.input)
             }
@@ -147,8 +157,9 @@ export default {
           // console.log(Array.from(this.input).map(ch => ch.charCodeAt()))
           this.serialport.write(this.input)
           this.input = ''
+          // console.log(this.history)
         } else if (ev.keyCode === 8) {
-          if (this.term._core.buffer.x > 0) {
+          if (this.input.length > 0) {
             this.term.write('\b \b')
             this.input = this.input.slice(0, -1)
           }
@@ -216,7 +227,7 @@ export default {
             .pipe(timestampPrefix)
             // .pipe(lineBreaker)
             .on('data', data => {
-              console.log(Array.from(data).map(ch => ch.charCodeAt()))
+              // console.log(Array.from(data).map(ch => ch.charCodeAt()))
               this.term.write(data)
             })
         })

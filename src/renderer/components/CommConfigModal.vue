@@ -180,7 +180,7 @@
         implicitCarriageEnabled: true,
         implicitLineFeedEnabled: true,
         localEchoEnabled: true,
-        historyEnabled: false,
+        historyEnabled: true,
         sharedOverWebsocket: false
       }
     },

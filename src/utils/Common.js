@@ -14,7 +14,7 @@ function PadMilliseconds (v) {
 function TimestampPrefix () {
   return through2.obj(function (line, _, next) {
     let position = line.indexOf('\r\n')
-    console.log(position, line)
+    // console.log(position, line)
     if (position !== -1) {
       let d = new Date()
       let timestamp = d.toTimeString().slice(0, 8) + '.' + PadMilliseconds(d.getMilliseconds()) + ': '
@@ -35,20 +35,20 @@ function LineParser (implicitCarriage, implicitLineFeed) {
     // console.log('lineparser before', Buffer.from(line))
     // line = line.replace(/(?<!\r)\n\r(?!\n)/g, '\r\n')
     line = line.replace(/([^\r])\n\r(?!\n)/g, '$1\r\n')
-    console.log('lineparser 0', Buffer.from(line))
+    // console.log('lineparser 0', Buffer.from(line))
     if (implicitCarriage) line = line.replace(/((\r\n|\n\r)+|[^\r])\n(?!\r)/g, '$1\r\n')
-    console.log('lineparser 1', Buffer.from(line))
+    // console.log('lineparser 1', Buffer.from(line))
     if (implicitLineFeed) line = line.replace(/((\r\n|\n\r)+|[^\n])\r(?!\n)/g, '$1\r\n')
-    console.log('lineparser 2', Buffer.from(line))
+    // console.log('lineparser 2', Buffer.from(line))
     // console.log('lineparser after', Buffer.from(line))
 
     let data = line
     while ((position = data.indexOf('\r\n')) !== -1) {
-      console.log(Buffer.from(data.slice(0, position + 2)))
+      // console.log(Buffer.from(data.slice(0, position + 2)))
       this.push(data.slice(0, position + 2))
       data = data.slice(position + 2)
     }
-    console.log(Buffer.from(data))
+    // console.log(Buffer.from(data))
     this.push(data)
     next()
   }, done => done())
@@ -62,13 +62,4 @@ function LineBreaker () {
   }, done => done())
 }
 
-function ImplicitCarriage () {
-  return through2.obj(function (line, _, next) {
-    console.log(line)
-    line.replace(/[^\r\n][\r\n]{1}$/, '\r\n')
-    this.push(line)
-    next()
-  }, done => done())
-}
-
-export {TimestampPrefix, ImplicitCarriage, LineBreaker, LineParser}
+export {TimestampPrefix, LineBreaker, LineParser}
