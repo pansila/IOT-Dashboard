@@ -178,6 +178,8 @@
         timestampEnabled: true,
         highlightEnabled: true,
         implicitCarriageEnabled: true,
+        implicitLineFeedEnabled: true,
+        localEchoEnabled: true,
         historyEnabled: false,
         sharedOverWebsocket: false
       }
@@ -268,6 +270,8 @@
               timestampEnabled: this.timestampEnabled,
               highlightEnabled: this.highlightEnabled,
               implicitCarriageEnabled: this.implicitCarriageEnabled,
+              implicitLineFeedEnabled: this.implicitLineFeedEnabled,
+              localEchoEnabled: this.localEchoEnabled,
               historyEnabled: this.historyEnabled
             })
             this.$store.commit('ADD_TAB', idx)

@@ -12,7 +12,8 @@ import 'xterm/dist/xterm.css'
 import resizesensor from './ResizeSensor'
 import SerialPort from 'serialport'
 import Highlighter from '@utils/Highlighter'
-import {TimestampPrefix, ImplicitCarriage} from '@utils/Common.js'
+import {TimestampPrefix, LineParser} from '@utils/Common.js'
+// import {TimestampPrefix, LineBreaker, LineParser} from '@utils/Common.js'
 import {PassThrough} from 'stream'
 
 Terminal.applyAddon(fit)
@@ -80,7 +81,7 @@ export default {
       console.log('close')
     },
     setupTerminal () {
-      console.log('pid : ' + this.terminal.pid + ' is on ready')
+      // console.log('pid : ' + this.terminal.pid + ' is on ready')
       let terminalContainer = document.getElementById('terminal' + this.terminal.pid)
       this.term = new Terminal({
         rendererType: 'dom'
@@ -135,8 +136,15 @@ export default {
             this.historyIdx = this.history.length - 1
             this.lookupHistory = false
           }
+          if (this.terminal.localEchoEnabled) {
+            this.term.write('\b'.repeat(this.input.length) +
+                            ' '.repeat(this.input.length) +
+                            '\b'.repeat(this.input.length))
+          } else {
+            this.serialport.write('\r\n')
+          }
           this.input += data
-          // this.term.write('\r\n')
+          // console.log(Array.from(this.input).map(ch => ch.charCodeAt()))
           this.serialport.write(this.input)
           this.input = ''
         } else if (ev.keyCode === 8) {
@@ -146,10 +154,14 @@ export default {
           }
         } else if (printable) {
           this.input += data
-          this.term.write(data)
+          if (this.terminal.localEchoEnabled) {
+            this.term.write(data)
+          } else {
+            this.serialport.write(data)
+          }
         }
       })
-      console.log(this.terminal.comm + ' mounted is going on')
+      // console.log(this.terminal.comm + ' mounted is going on')
     },
     setupSerialport () {
       return new Promise((resolve, reject) => {
@@ -190,18 +202,20 @@ export default {
           this.serialport = port
           this.setupTerminal()
 
-          const parser = new SerialPort.parsers.Readline({ delimiter: '\r\n' })
+          // const lineParser = new SerialPort.parsers.Readline({ delimiter: '\r\n' })
+          const lineParser = LineParser(this.terminal.implicitCarriageEnabled, this.terminal.implicitLineFeedEnabled)
           const highlighter = this.terminal.highlightEnabled ? Highlighter(this.highlightOptions) : new PassThrough()
           const timestampPrefix = this.terminal.timestampEnabled ? TimestampPrefix() : new PassThrough()
-          const implicitCarriage = this.terminal.implicitCarriageEnabled ? ImplicitCarriage() : new PassThrough()
-          // this.promptOffset = this.terminal.timestampEnabled ? 14 : 2
+          // const lineBreaker = this.terminal.implicitCarriageEnabled ? LineBreaker() : new PassThrough()
 
           port.on('close', e => { this.serialport = null; console.log('Close', e) })
           port.on('error', alert)
-          port.pipe(parser)
+          port
+            .pipe(lineParser)
             .pipe(highlighter)
             .pipe(timestampPrefix)
-            .pipe(implicitCarriage).on('data', data => {
+            // .pipe(lineBreaker)
+            .on('data', data => {
               console.log(Array.from(data).map(ch => ch.charCodeAt()))
               this.term.write(data)
             })

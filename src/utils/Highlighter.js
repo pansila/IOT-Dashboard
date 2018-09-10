@@ -235,6 +235,7 @@ function highlight (options) {
 
   // console.log(JSON.stringify(options.highlightOptions, null, 2))
   function write (line, _, next) {
+    // console.log(line)
     this.push(highlightLine(line, options.highlightOptions))
     next()
   }
