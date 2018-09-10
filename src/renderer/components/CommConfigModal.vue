@@ -100,12 +100,14 @@
         <b-form inline>
           <b-form-checkbox class="ml-2 mb-2 mr-sm-2 mb-sm-0"
                          v-model="timestampEnabled"
+                         v-b-tooltip.hover title="在每行消息开头添加时间戳"
                          value="true"
                          size='sm'>
             时间戳
           </b-form-checkbox>
           <b-form-checkbox class="mb-2 mr-sm-2 mb-sm-0"
                          v-model="highlightEnabled"
+                         v-b-tooltip.hover title="消息高亮，规则可定制，具体见设置"
                          value="true"
                          size='sm'>
             消息高亮
@@ -113,10 +115,11 @@
           <b-input-group size="sm" v-show="connectionType === 'local'">
             <b-input-group-prepend>
                 <b-form-checkbox
-                       class="mb-2 mr-sm-2 mb-sm-0"
-                       size="sm"
-                       aria-label="Checkbox for following text input"
-                       v-model="sharedOverWebsocket">
+                         class="mb-2 mr-sm-2 mb-sm-0"
+                         v-b-tooltip.hover title="以websocket方式在局域网中共享该终端，地址就是本机IP地址+端口号+共享名称，如:192.168.1.100:8848/COM3"
+                         size="sm"
+                         aria-label="Checkbox for following text input"
+                         v-model="sharedOverWebsocket">
                   远程共享该串口
                 </b-form-checkbox>
             </b-input-group-prepend>

@@ -10,14 +10,17 @@
                   <b-col class="my-d-flex-grid p-0">
                     <my-terminal
                       class="my-d-flex"
-                      :terminal="terminals[terminals.length - 1]"
+                      :terminal="terminals[i]"
                       :id="'terminal' + i"
                       >
                     </my-terminal>
                   </b-col>
                   <b-col cols="3" class="p-0">
                     <b-card no-body>
-                      <b-card-header>Coming Soon...</b-card-header>
+                      <b-card-header bg-blue>命令历史</b-card-header>
+                      <b-list-group>
+                        <b-list-group-item v-for="(c, _, d) in terminals[i].commandHistory" :key="`${c}${i}${d}`">{{c}}</b-list-group-item>
+                      </b-list-group>
                       <b-card-img bottom src="https://picsum.photos/600/200/?image=35" />
                     </b-card>
                   </b-col>

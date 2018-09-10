@@ -5,6 +5,7 @@
 </template>
 
 <script>
+import {mapState} from 'vuex'
 import {Terminal} from 'xterm'
 import * as fit from 'xterm/lib/addons/fit/fit'
 // import * as attach from 'xterm/lib/addons/attach/attach'
@@ -21,20 +22,25 @@ Terminal.applyAddon(fit)
 
 export default {
   name: 'Console',
-  props: {
-    terminal: {
-      type: Object,
-      default: {}
-    }
+  props: [
+    'pid'
+  ],
+  computed: {
+    ...mapState({
+      terminals: state => state.Comm.terminals
+    })
   },
+  //   terminal: {
+  //     type: Object,
+  //     default: {}
+  //   }
+  // },
   data () {
     return {
       term: null,
       // terminalSocket: null
       serialport: null,
       input: '',
-      history: [''],
-      historyIdx: 0,
       lookupHistory: false,
       // promptOffset: 0,
       highlightOptions: {
@@ -82,7 +88,7 @@ export default {
     },
     setupTerminal () {
       // console.log('pid : ' + this.terminal.pid + ' is on ready')
-      let terminalContainer = document.getElementById('terminal' + this.terminal.pid)
+      let terminalContainer = document.getElementById('terminal' + this.terminals[this.pid].pid)
       this.term = new Terminal({
         rendererType: 'dom'
       })
@@ -99,19 +105,22 @@ export default {
         const printable = !ev.altKey && !ev.altGraphKey && !ev.ctrlKey && !ev.metaKey
 
         if (ev.code === 'ArrowUp' || ev.code === 'ArrowDown') {
-          if (!this.terminal.localHistoryEnabled) {
+          if (!this.terminals[this.pid].localHistoryEnabled) {
             this.serialport.write(data)
             return
           }
 
-          if (!this.lookupHistory && this.historyIdx === this.history.length - 1 && this.input &&
-              this.history[this.history.length - 1] !== this.input) {
-            this.history.push(this.input)
-            this.historyIdx++
+          if (!this.lookupHistory &&
+              this.terminals[this.pid].historyIdx === this.terminals[this.pid].history.length - 1 &&
+              this.input &&
+              this.terminals[this.pid].history[this.terminals[this.pid].history.length - 1] !== this.input) {
+            this.$store.commit('ADD_HISTORY', this.pid, this.input)
+            // this.terminals[this.pid].history.push(this.input)
+            // this.terminals[this.pid].historyIdx++
           }
           if (ev.code === 'ArrowDown') {
-            if (this.historyIdx !== this.history.length - 1) {
-              this.historyIdx++
+            if (this.terminals[this.pid].historyIdx !== this.terminals[this.pid].history.length - 1) {
+              // this.terminals[this.pid].historyIdx++
             } else if (this.input !== '') {
               this.term.write('\b'.repeat(this.input.length) +
                               ' '.repeat(this.input.length) +
@@ -126,10 +135,10 @@ export default {
           this.term.write('\b'.repeat(this.input.length) +
                           ' '.repeat(this.input.length) +
                           '\b'.repeat(this.input.length))
-          this.input = this.history[this.historyIdx]
+          this.input = this.terminals[this.pid].history[this.terminals[this.pid].historyIdx]
           this.term.write(this.input)
-          if (ev.code === 'ArrowUp' && this.historyIdx > 0) {
-            this.historyIdx--
+          if (ev.code === 'ArrowUp' && this.terminals[this.pid].historyIdx > 0) {
+            this.terminals[this.pid].historyIdx--
           }
           return
         }
@@ -139,14 +148,14 @@ export default {
         }
 
         if (ev.keyCode === 13) {
-          if (this.terminal.localHistoryEnabled) {
-            if (this.input && this.history[this.history.length - 1] !== this.input) {
-              this.history.push(this.input)
+          if (this.terminals[this.pid].localHistoryEnabled) {
+            if (this.input && this.terminals[this.pid].history[this.terminals[this.pid].history.length - 1] !== this.input) {
+              // this.terminals[this.pid].history.push(this.input)
             }
-            this.historyIdx = this.history.length - 1
+            this.terminals[this.pid].historyIdx = this.terminals[this.pid].history.length - 1
             this.lookupHistory = false
           }
-          if (this.terminal.localEchoEnabled) {
+          if (this.terminals[this.pid].localEchoEnabled) {
             this.term.write('\b'.repeat(this.input.length) +
                             ' '.repeat(this.input.length) +
                             '\b'.repeat(this.input.length))
@@ -166,28 +175,28 @@ export default {
           }
         } else if (printable) {
           this.input += data
-          if (this.terminal.localEchoEnabled) {
+          if (this.terminals[this.pid].localEchoEnabled) {
             this.term.write(data)
           } else {
             this.serialport.write(data)
           }
         }
       })
-      // console.log(this.terminal.comm + ' mounted is going on')
+      // console.log(this.terminals[this.pid].comm + ' mounted is going on')
     },
     setupSerialport () {
       return new Promise((resolve, reject) => {
         SerialPort.list()
           .then(ports => {
             ports.forEach(port => {
-              if (this.terminal.comm === port.comName) {
-                // console.log(this.terminal)
-                const port = new SerialPort(this.terminal.comm, {
+              if (this.terminals[this.pid].comm === port.comName) {
+                // console.log(this.terminals[this.pid])
+                const port = new SerialPort(this.terminals[this.pid].comm, {
                   autoOpen: false, // to catch opening error
-                  baudRate: this.terminal.baudRate,
-                  dataBits: this.terminal.dataBits,
-                  stopBits: this.terminal.stopBits,
-                  parity: this.terminal.parity
+                  baudRate: this.terminals[this.pid].baudRate,
+                  dataBits: this.terminals[this.pid].dataBits,
+                  stopBits: this.terminals[this.pid].stopBits,
+                  parity: this.terminals[this.pid].parity
                 })
                 port.open(err => {
                   if (err === null) {
@@ -215,10 +224,10 @@ export default {
           this.setupTerminal()
 
           // const lineParser = new SerialPort.parsers.Readline({ delimiter: '\r\n' })
-          const lineParser = LineParser(this.terminal.implicitCarriageEnabled, this.terminal.implicitLineFeedEnabled)
-          const highlighter = this.terminal.highlightEnabled ? Highlighter(this.highlightOptions) : new PassThrough()
-          const timestampPrefix = this.terminal.timestampEnabled ? TimestampPrefix() : new PassThrough()
-          // const lineBreaker = this.terminal.implicitCarriageEnabled ? LineBreaker() : new PassThrough()
+          const lineParser = LineParser(this.terminals[this.pid].implicitCarriageEnabled, this.terminals[this.pid].implicitLineFeedEnabled)
+          const highlighter = this.terminals[this.pid].highlightEnabled ? Highlighter(this.highlightOptions) : new PassThrough()
+          const timestampPrefix = this.terminals[this.pid].timestampEnabled ? TimestampPrefix() : new PassThrough()
+          // const lineBreaker = this.terminals[this.pid].implicitCarriageEnabled ? LineBreaker() : new PassThrough()
 
           port.on('close', e => { this.serialport = null; console.log('Close', e) })
           port.on('error', alert)

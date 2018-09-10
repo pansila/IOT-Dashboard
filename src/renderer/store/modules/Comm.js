@@ -1,7 +1,8 @@
 const state = {
   terminals: [],
   commList: [],
-  tabs: []
+  tabs: [],
+  commandHistory: []
 }
 
 // sync mutations
@@ -23,6 +24,15 @@ const mutations = {
   },
   DEL_TAB (state, i) {
     state.tabs.splice(i, 1)
+  },
+  ADD_HISTORY (state, i, command) {
+    if (state.terminals[i].commandHistory === undefined) {
+      state.terminals[i].history = ['']
+      state.terminals[i].historyIdx = 0
+    } else {
+      state.terminals[i].commandHistory.push(command)
+      state.terminals[i].historyIdx = state.terminals[i].commandHistory.length - 1
+    }
   }
 }
 
