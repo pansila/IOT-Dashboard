@@ -27,7 +27,7 @@ export default {
   ],
   computed: {
     ...mapState({
-      terminals: state => state.Comm.terminals
+      terminals: state => state.terminal.terminals
     }),
     terminal () {
       return this.terminals[this.pid]
@@ -37,6 +37,24 @@ export default {
     },
     historyIdx () {
       return this.terminal.historyIdx
+    },
+    commandIndex () {
+      return this.terminal.historyRecallIdx
+    }
+  },
+  watch: {
+    commandIndex (newVal, oldVal) {
+      if (newVal !== null) {
+        this.term.write('\b'.repeat(this.input.length) +
+                        ' '.repeat(this.input.length) +
+                        '\b'.repeat(this.input.length))
+        this.input = this.history[newVal]
+        this.term.write(this.input)
+      } else if (this.input !== '') {
+        this.term.write('\b'.repeat(this.input.length))
+        this.serialport.write(this.input + '\r')
+        this.input = ''
+      }
     }
   },
   data () {

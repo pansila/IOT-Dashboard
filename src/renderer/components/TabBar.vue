@@ -16,9 +16,13 @@
                   </b-col>
                   <b-col cols="3" class="p-0">
                     <b-card no-body>
-                      <b-card-header>命令历史</b-card-header>
+                      <b-card-header>历史命令</b-card-header>
                       <b-list-group>
-                        <b-list-group-item v-for="(c, d) in terminals[i].history" :key="`${c}-${i}-${d}`">{{c}}</b-list-group-item>
+                        <b-list-group-item href="#"
+                          @click="onHistoryClick(i, j)"
+                          @dblclick="onHistoryDblClick(i)"
+                          v-for="(c, j) in terminals[i].history"
+                          :key="`${c}-${i}-${j}`">{{c}}</b-list-group-item>
                       </b-list-group>
                     </b-card>
                   </b-col>
@@ -33,10 +37,7 @@
             <b-nav-item slot="tabs" v-b-modal.comm-config-modal href="#">
               +
             </b-nav-item>
-            <my-comm-config
-              modalID="comm-config-modal"
-              @ok="onCommOk">
-            </my-comm-config>
+            <my-comm-config modalID="comm-config-modal"></my-comm-config>
             <!-- Render this if no tabs -->
             <div slot="empty" style="margin: auto" class="h-100 text-center text-muted">
               There are no open tabs
@@ -91,9 +92,9 @@
     },
     computed: {
       ...mapState({
-        terminals: state => state.Comm.terminals,
-        commList: state => state.Comm.commList,
-        tabs: state => state.Comm.tabs
+        terminals: state => state.terminal.terminals,
+        commList: state => state.terminal.commList,
+        tabs: state => state.terminal.tabs
       })
     },
     mounted () {
@@ -103,15 +104,15 @@
         'vue: ' + require('vue/package.json').version)
     },
     methods: {
-      closeTab (x) {
-        for (let i = 0; i < this.tabs.length; i++) {
-          if (this.tabs[i] === x) {
-            this.$store.commit('DEL_TAB', i)
-            this.$store.commit('DEL_TERMINAL', i)
-          }
-        }
+      closeTab (i) {
+        this.$store.commit('DEL_TAB', i)
+        this.$store.commit('DEL_TERMINAL', i)
       },
-      onCommOk (evt) {
+      onHistoryClick (pid, cmdIdx) {
+        this.$store.commit('SHOW_HISTORY_COMMAND', {pid: pid, cmdIdx: cmdIdx})
+      },
+      onHistoryDblClick (pid) {
+        this.$store.commit('ISSUE_HISTORY_COMMAND', pid)
       }
     },
     components: {

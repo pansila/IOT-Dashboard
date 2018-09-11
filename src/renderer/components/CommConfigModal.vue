@@ -4,7 +4,7 @@
            centered
            title="配置串口信息"
            size="lg"
-           @ok="onCommOk"
+           @ok.prevent="onCommOk"
            @shown="onShown">
     <form>
       <b-form-group label="连接方式">
@@ -188,13 +188,13 @@
       }
     },
     // mounted () {
-    //   console.log(this.$store.state.Comm)
+    //   console.log(this.$store.state.terminal)
     // },
     computed: {
       ...mapState({
-        terminals: state => state.Comm.terminals,
-        commList: state => state.Comm.commList,
-        tabs: state => state.Comm.tabs
+        terminals: state => state.terminal.terminals,
+        commList: state => state.terminal.commList,
+        tabs: state => state.terminal.tabs
       }),
       IPState () {
         if (!this.remoteIP) return true
@@ -248,7 +248,6 @@
           .catch(alert)
       },
       onCommOk (evt) {
-        evt.preventDefault()
         if (!this.commSelected || !this.baudrateSelected ||
             !this.databitSelected || !this.stopbitSelected ||
             !this.paritySelected) {
@@ -277,7 +276,8 @@
               localEchoEnabled: this.localEchoEnabled,
               localHistoryEnabled: this.localHistoryEnabled,
               history: [''],
-              historyIdx: 0
+              historyIdx: 0,
+              historyRecallIdx: null
             })
             this.$store.commit('ADD_TAB', idx)
             this.$refs.commModal.hide()
