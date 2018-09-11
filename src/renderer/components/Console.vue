@@ -173,17 +173,16 @@ export default {
             }
             this.lookupHistory = false
           }
+
+          this.input += data
           if (this.terminal.localEchoEnabled) {
             this.term.write('\b'.repeat(this.input.length))
+            this.serialport.write(this.input)
           } else {
             this.serialport.write('\r')
             // this.term.write('\r')
           }
-          this.input += data
-          // console.log(Array.from(this.input).map(ch => ch.charCodeAt()))
-          this.serialport.write(this.input)
           this.input = ''
-          // console.log(this.historyIdx, this.history)
         } else if (ev.keyCode === 8) {
           if (this.input.length > 0) {
             this.term.write('\b \b')
