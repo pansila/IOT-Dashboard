@@ -20,7 +20,6 @@
                       <b-list-group>
                         <b-list-group-item v-for="(c, d) in terminals[i].history" :key="`${c}-${i}-${d}`">{{c}}</b-list-group-item>
                       </b-list-group>
-                      <b-card-img bottom src="https://picsum.photos/600/200/?image=35" />
                     </b-card>
                   </b-col>
                 </b-row>
@@ -97,8 +96,12 @@
         tabs: state => state.Comm.tabs
       })
     },
-    // mounted () {
-    // },
+    mounted () {
+      console.log('node: ' + process.versions.node,
+        'electron: ' + process.versions['atom-shell'],
+        'platform: ' + require('os').platform(),
+        'vue: ' + require('vue/package.json').version)
+    },
     methods: {
       closeTab (x) {
         for (let i = 0; i < this.tabs.length; i++) {

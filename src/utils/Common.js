@@ -32,13 +32,14 @@ function LineParser (implicitCarriage, implicitLineFeed) {
     let position
     line = line.toString()
 
+    // console.log('lineparser before', line)
     // console.log('lineparser before', Buffer.from(line))
     // line = line.replace(/(?<!\r)\n\r(?!\n)/g, '\r\n')
-    line = line.replace(/([^\r])\n\r(?!\n)/g, '$1\r\n')
+    line = line.replace(/([^\r]|^)\n\r/g, '$1\r\n')
     // console.log('lineparser 0', Buffer.from(line))
-    if (implicitCarriage) line = line.replace(/((\r\n|\n\r)+|[^\r])\n(?!\r)/g, '$1\r\n')
+    if (implicitCarriage) line = line.replace(/((\r\n)+|[^\r]|^)\n($|[^\r]|(\r\n)+)/g, '$1\r\n$3')
     // console.log('lineparser 1', Buffer.from(line))
-    if (implicitLineFeed) line = line.replace(/((\r\n|\n\r)+|[^\n])\r(?!\n)/g, '$1\r\n')
+    if (implicitLineFeed) line = line.replace(/((\r\n)+|[^\n]|^)\r(?!\n)/g, '$1\r\n')
     // console.log('lineparser 2', Buffer.from(line))
     // console.log('lineparser after', Buffer.from(line))
 
