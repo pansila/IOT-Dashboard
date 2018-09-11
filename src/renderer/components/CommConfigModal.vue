@@ -264,7 +264,7 @@
 
           this.checkComm(this.commSelected).then(() => {
             this.$store.commit('ADD_TERMINAL', {
-              pid: idx,
+            //   pid: idx,
               comm: this.commSelected,
               baudRate: this.baudrateSelected,
               dataBits: this.databitSelected,
@@ -275,10 +275,12 @@
               implicitCarriageEnabled: this.implicitCarriageEnabled,
               implicitLineFeedEnabled: this.implicitLineFeedEnabled,
               localEchoEnabled: this.localEchoEnabled,
-              localHistoryEnabled: this.localHistoryEnabled
+              localHistoryEnabled: this.localHistoryEnabled,
+              history: [''],
+              historyIdx: 0
             })
             this.$store.commit('ADD_TAB', idx)
-            this.$refs.commModal.hide() // TODO
+            this.$refs.commModal.hide()
           }, console.log)
         } else {
           alert(`It's already opened, choose another one`)

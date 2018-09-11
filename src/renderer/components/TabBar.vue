@@ -4,22 +4,21 @@
       <b-tabs class="h-100 my-d-flex" card>
         <b-tab class="my-d-flex" no-body title="控制台" active>
           <b-tabs pills card end class="my-d-flex">
-            <b-tab no-body :title="commList[i]" v-for="i in tabs" :key="`console${i}`">
+            <b-tab no-body :title="commList[t]" v-for="(t, i) in tabs" :key="`console${t}`">
               <b-container fluid class="my-d-flex-grid">
                 <b-row class="flex-grow-1">
                   <b-col class="my-d-flex-grid p-0">
                     <my-terminal
+                      :pid="i"
                       class="my-d-flex"
-                      :terminal="terminals[i]"
-                      :id="'terminal' + i"
-                      >
+                      :id="'terminal' + i" >
                     </my-terminal>
                   </b-col>
                   <b-col cols="3" class="p-0">
                     <b-card no-body>
-                      <b-card-header bg-blue>命令历史</b-card-header>
+                      <b-card-header>命令历史</b-card-header>
                       <b-list-group>
-                        <b-list-group-item v-for="(c, _, d) in terminals[i].commandHistory" :key="`${c}${i}${d}`">{{c}}</b-list-group-item>
+                        <b-list-group-item v-for="(c, d) in terminals[i].history" :key="`${c}-${i}-${d}`">{{c}}</b-list-group-item>
                       </b-list-group>
                       <b-card-img bottom src="https://picsum.photos/600/200/?image=35" />
                     </b-card>
