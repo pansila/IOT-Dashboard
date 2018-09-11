@@ -182,7 +182,7 @@
         highlightEnabled: true,
         implicitCarriageEnabled: true,
         implicitLineFeedEnabled: true,
-        localEchoEnabled: false,
+        localEchoEnabled: true,
         localHistoryEnabled: true,
         sharedOverWebsocket: false
       }

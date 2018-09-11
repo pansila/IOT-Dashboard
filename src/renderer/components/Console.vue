@@ -174,10 +174,9 @@ export default {
             this.lookupHistory = false
           }
 
-          this.input += data
           if (this.terminal.localEchoEnabled) {
             this.term.write('\b'.repeat(this.input.length))
-            this.serialport.write(this.input)
+            this.serialport.write(this.input + '\r')
           } else {
             this.serialport.write('\r')
             // this.term.write('\r')
