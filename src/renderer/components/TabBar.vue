@@ -19,6 +19,7 @@
                       <b-card-header>历史命令</b-card-header>
                       <b-list-group>
                         <b-list-group-item href="#"
+                          class="text-center"
                           @click="onHistoryClick(i, j)"
                           @dblclick="onHistoryDblClick(i)"
                           v-for="(c, j) in terminals[i].history"
@@ -40,8 +41,8 @@
             <my-comm-config modalID="comm-config-modal"></my-comm-config>
             <!-- Render this if no tabs -->
             <div slot="empty" style="margin: auto" class="h-100 text-center text-muted">
-              There are no open tabs
-              <br> Open a new tab using + button.
+              没有打开的终端
+              <br> 点击下方+按钮创建一个新的终端
             </div>
           </b-tabs>
         </b-tab>

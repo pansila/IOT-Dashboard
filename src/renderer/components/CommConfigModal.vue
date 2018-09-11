@@ -98,33 +98,59 @@
       <b-form-checkbox v-model="advancedComm" class="mb-2 mr-sm-2 mb-sm-0">显示高级选项</b-form-checkbox>
       <b-card no-body v-show="advancedComm === true">
         <b-form inline>
-          <b-form-checkbox class="ml-2 mb-2 mr-sm-2 mb-sm-0"
+          <b-form-checkbox class="ml-2 mb-2 ml-sm-2 mr-sm-0 mb-sm-0"
                          v-model="timestampEnabled"
                          v-b-tooltip.hover title="在每行消息开头添加时间戳"
                          value="true"
                          size='sm'>
             时间戳
           </b-form-checkbox>
-          <b-form-checkbox class="mb-2 mr-sm-2 mb-sm-0"
+          <b-form-checkbox class="mb-2 ml-sm-2 mr-sm-0 mb-sm-0"
                          v-model="highlightEnabled"
                          v-b-tooltip.hover title="消息高亮，规则可定制，具体见设置"
                          value="true"
                          size='sm'>
             消息高亮
           </b-form-checkbox>
-          <b-input-group size="sm" v-show="connectionType === 'local'">
-            <b-input-group-prepend>
-                <b-form-checkbox
-                         class="mb-2 mr-sm-2 mb-sm-0"
-                         v-b-tooltip.hover title="以websocket方式在局域网中共享该终端，地址就是本机IP地址+端口号+共享名称，如:192.168.1.100:8848/COM3"
-                         size="sm"
-                         aria-label="Checkbox for following text input"
-                         v-model="sharedOverWebsocket">
-                  远程共享该串口
-                </b-form-checkbox>
-            </b-input-group-prepend>
-            <b-form-input type="text" placeholder="共享名称(默认当前串口号)" v-show="sharedOverWebsocket === true"/>
-          </b-input-group>
+          <b-form-checkbox class="mb-2 ml-sm-2 mr-sm-0 mb-sm-0"
+                         v-model="implicitCarriageEnabled"
+                         v-b-tooltip.hover title="当单独出现\n时，自动在前面补足\r，补足后\n变成\r\n，成对的\r\n不受影响"
+                         value="true"
+                         size='sm'>
+            自动补足"\r"
+          </b-form-checkbox>
+          <b-form-checkbox class="mb-2 ml-sm-2 mr-sm-0 mb-sm-0"
+                         v-model="implicitLineFeedEnabled"
+                         v-b-tooltip.hover title="当单独出现\r时，自动在后面补足\n，补足后\r变成\r\n，成对的\r\n不受影响"
+                         value="true"
+                         size='sm'>
+            自动补足"\n"
+          </b-form-checkbox>
+          <b-form-checkbox class="mb-2 ml-sm-2 mr-sm-0 mb-sm-0"
+                         v-model="localEchoEnabled"
+                         v-b-tooltip.hover title="一般设备端会回显消息，如果不支持可以开启该功能"
+                         value="true"
+                         size='sm'>
+            本地消息回显
+          </b-form-checkbox>
+          <b-form-checkbox class="mb-2 ml-sm-2 mr-sm-0 mb-sm-0"
+                         v-model="localEchoEnabled"
+                         v-b-tooltip.hover title="一般设备端会提供命令记忆功能，如果不支持可以开启该功能，使用up和down方向键选择"
+                         value="true"
+                         size='sm'>
+            本地命令记录
+          </b-form-checkbox>
+        </b-form>
+        <b-form inline>
+          <b-form-checkbox
+                   class="ml-2 mb-2 ml-sm-2 mr-sm-0 mb-sm-0"
+                   v-b-tooltip.hover title="以websocket方式在局域网中共享该终端，地址就是本机IP地址+端口号+共享名称，如:192.168.1.100:8848/COM3"
+                   size="sm"
+                   aria-label="Checkbox for following text input"
+                   v-model="sharedOverWebsocket">
+            远程共享该串口
+          </b-form-checkbox>
+          <b-form-input size="sm" type="text" placeholder="共享名称(默认当前串口号)" v-show="sharedOverWebsocket === true"/>
         </b-form>
       </b-card>
     </form>
