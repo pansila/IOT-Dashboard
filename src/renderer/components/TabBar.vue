@@ -1,20 +1,20 @@
 <template>
   <div class="h-100">
     <b-card class="h-100" no-body>
-      <b-tabs class="h-100 my-d-flex-grow" card>
-        <b-tab class="my-d-flex-grow" no-body title="控制台" active>
-          <b-tabs pills card end class="my-d-flex-grow">
+      <b-tabs class="h-100 iot-d-flex-grow" card>
+        <b-tab class="iot-d-flex-grow" no-body title="控制台" active>
+          <b-tabs pills card end class="iot-d-flex-grow">
             <b-tab @contextmenu="onRightClick" no-body :title="commList[t]" v-for="(t, i) in tabs" :key="`console${t}`">
-              <b-container fluid class="my-d-flex-grid">
+              <b-container fluid class="iot-d-flex-grid">
                 <b-row class="flex-grow-1">
-                  <b-col class="my-d-flex-grid p-0">
-                    <my-terminal
+                  <b-col class="iot-d-flex-grid p-0">
+                    <iot-terminal
                       :pid="i"
-                      class="my-d-flex-grow"
+                      class="iot-d-flex-grow"
                       :id="'terminal' + i" >
-                    </my-terminal>
+                    </iot-terminal>
                   </b-col>
-                  <b-col cols="3" class="my-d-flex">
+                  <b-col cols="3" class="iot-d-flex">
                     <b-row class="h-50">
                       <b-card no-body class="flex-grow-1" style="overflow: auto;">
                         <b-card-header class="text-center">历史命令</b-card-header>
@@ -30,14 +30,21 @@
                     <b-row>
                       <b-card no-body class="flex-grow-1">
                         <b-card-header class="text-center">脚本</b-card-header>
-                        <b-card-img bottom src="https://picsum.photos/600/200/?image=23" />
+                        <div class="m-2">
+                          <b-form-select v-model="scriptSelected" :options="scripts" class="mb-2" />
+                          <b-button-group size="sm">
+                            <b-btn class="flex-grow-1" variant="success">运行</b-btn>
+                            <b-btn class="flex-grow-1" variant="primary">编辑</b-btn>
+                            <b-btn variant="danger">删除</b-btn>
+                          </b-button-group>
+                        </div>
                       </b-card>
                     </b-row>
                   </b-col>
                 </b-row>
               </b-container>
               <div style="position: relative;">
-                <b-btn size="sm" variant="danger" class="my-close-btn" @click="()=>closeTab(i)">
+                <b-btn size="sm" variant="danger" class="iot-close-btn" @click="()=>closeTab(i)">
                   x
                 </b-btn>
               </div>
@@ -45,7 +52,7 @@
             <b-nav-item slot="tabs" v-b-modal.comm-config-modal href="#">
               +
             </b-nav-item>
-            <my-comm-config modalID="comm-config-modal"></my-comm-config>
+            <iot-comm-config modalID="comm-config-modal"></iot-comm-config>
             <!-- Render this if no tabs -->
             <div slot="empty" style="margin: auto" class="h-100 text-center text-muted">
               没有打开的终端
@@ -87,7 +94,7 @@
 </template>
 
 <script>
-  import Console from '@components/Console'
+  import Terminal from '@components/Terminal'
   import CommConfigModal from '@components/CommConfigModal'
   import {mapState} from 'vuex'
   
@@ -95,7 +102,14 @@
     name: 'tabbar',
     data () {
       return {
-        tabCounter: 0
+        tabCounter: 0,
+        scripts: [
+          { value: '1', text: 'test1 for abc' },
+          { value: '2', text: 'test2 for abc' },
+          { value: '3', text: 'test3 for abc' },
+          { value: '4', text: 'test4 for abc' }
+        ],
+        scriptSelected: 0
       }
     },
     computed: {
@@ -127,15 +141,15 @@
       }
     },
     components: {
-      'my-terminal': Console,
-      'my-comm-config': CommConfigModal
+      'iot-terminal': Terminal,
+      'iot-comm-config': CommConfigModal
     }
   }
 </script>
 
 <style>
 /* .tab-content {
-  @extend .my-d-flex;
+  @extend .iot-d-flex;
 } */
 .tab-content {
   display: flex;
@@ -147,20 +161,20 @@
   flex-direction: column;
   flex-grow: 1;
 }
-.my-d-flex-grid {
+.iot-d-flex-grid {
   display: flex;
   flex-grow: 1;
 }
-.my-d-flex {
+.iot-d-flex {
   display: flex;
   flex-direction: column;
 }
-.my-d-flex-grow {
+.iot-d-flex-grow {
   display: flex;
   flex-direction: column;
   flex-grow: 1;
 }
-.my-close-btn {
+.iot-close-btn {
   position: absolute;
   right: 0;
 }
