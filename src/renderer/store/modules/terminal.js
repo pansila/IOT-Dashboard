@@ -27,7 +27,7 @@ const mutations = {
   ADD_HISTORY (state, {pid, input}) {
     if (state.terminals[pid].history.length === 1 && state.terminals[pid].history[0] === '') {
       state.terminals[pid].history = [input]
-    } else {
+    } else if (state.terminals[pid].history[state.terminals[pid].history.length - 1] !== input) {
       state.terminals[pid].history.push(input)
     }
     state.terminals[pid].historyIdx = state.terminals[pid].history.length - 1

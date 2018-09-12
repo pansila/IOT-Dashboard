@@ -4,7 +4,7 @@
       <b-tabs class="h-100 my-d-flex" card>
         <b-tab class="my-d-flex" no-body title="控制台" active>
           <b-tabs pills card end class="my-d-flex">
-            <b-tab no-body :title="commList[t]" v-for="(t, i) in tabs" :key="`console${t}`">
+            <b-tab @contextmenu="onRightClick" no-body :title="commList[t]" v-for="(t, i) in tabs" :key="`console${t}`">
               <b-container fluid class="my-d-flex-grid">
                 <b-row class="flex-grow-1">
                   <b-col class="my-d-flex-grid p-0">
@@ -16,10 +16,9 @@
                   </b-col>
                   <b-col cols="3" class="p-0">
                     <b-card no-body>
-                      <b-card-header>历史命令</b-card-header>
+                      <b-card-header class="text-center">历史命令</b-card-header>
                       <b-list-group>
                         <b-list-group-item href="#"
-                          class="text-center"
                           @click="onHistoryClick(i, j)"
                           @dblclick="onHistoryDblClick(i)"
                           v-for="(c, j) in terminals[i].history"
@@ -114,6 +113,9 @@
       },
       onHistoryDblClick (pid) {
         this.$store.commit('ISSUE_HISTORY_COMMAND', pid)
+      },
+      onRightClick (e) {
+        console.log(e)
       }
     },
     components: {

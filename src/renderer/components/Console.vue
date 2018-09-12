@@ -131,10 +131,7 @@ export default {
             return
           }
 
-          if (!this.lookupHistory &&
-              this.historyIdx === this.history.length - 1 &&
-              this.input &&
-              this.history[this.history.length - 1] !== this.input) {
+          if (!this.lookupHistory && this.historyIdx === this.history.length - 1 && this.input) {
             this.$store.commit('ADD_HISTORY', {pid: this.pid, input: this.input})
           }
           if (ev.code === 'ArrowDown') {
@@ -168,7 +165,7 @@ export default {
 
         if (ev.keyCode === 13) {
           if (this.terminal.localHistoryEnabled) {
-            if (this.input && this.history[this.history.length - 1] !== this.input) {
+            if (this.input) {
               this.$store.commit('ADD_HISTORY', {pid: this.pid, input: this.input})
             }
             this.lookupHistory = false
