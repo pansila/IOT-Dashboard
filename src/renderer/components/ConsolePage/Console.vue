@@ -26,11 +26,12 @@
             <b-row>
               <b-card no-body class="flex-grow-1">
                 <b-card-header class="text-center">脚本</b-card-header>
-                <div class="m-2">
+                <div class="m-2 iot-d-flex">
                   <b-form-select v-model="scriptSelected" :options="scripts" class="mb-2" />
                   <b-button-group size="sm">
                     <b-btn class="flex-grow-1" variant="success">运行</b-btn>
-                    <b-btn class="flex-grow-1" variant="primary">编辑</b-btn>
+                    <b-btn class="flex-grow-1">编辑</b-btn>
+                    <b-btn class="flex-grow-1">添加</b-btn>
                     <b-btn variant="danger">删除</b-btn>
                   </b-button-group>
                 </div>
