@@ -3,7 +3,7 @@
     <b-card class="h-100" no-body>
       <b-tabs class="h-100 iot-d-flex-grow" card>
         <b-tab class="iot-d-flex-grow" no-body title="控制台" active>
-          <iot-console></iot-console>
+          <iot-console/>
         </b-tab>
         <b-tab no-body title="调试">
           <b-card-header>Coming Soon...</b-card-header>
@@ -64,6 +64,7 @@
 </script>
 
 <style>
+/* <style lang="sass" scoped> */
 /* .tab-content {
   @extend .iot-d-flex;
 } */

@@ -7,8 +7,8 @@
             <iot-terminal
               :pid="i"
               class="iot-d-flex-grow"
-              :id="'terminal' + i" >
-            </iot-terminal>
+              :containerID="'terminal' + i" 
+              :id="'terminal' + i" />
           </b-col>
           <b-col cols="3" class="iot-d-flex">
             <b-row class="h-50">
@@ -29,12 +29,15 @@
                 <div class="m-2 iot-d-flex">
                   <b-form-select v-model="scriptSelected" :options="scripts" class="mb-2" />
                   <b-button-group size="sm">
-                    <b-btn class="flex-grow-1" variant="success">运行</b-btn>
-                    <b-btn class="flex-grow-1">编辑</b-btn>
-                    <b-btn class="flex-grow-1">添加</b-btn>
+                    <b-btn class="flex-grow-1" variant="primary">运行</b-btn>
+                    <b-btn class="flex-grow-1" variant="warning">停止</b-btn>
+                    <b-btn class="">编辑</b-btn>
+                    <b-btn class="">添加</b-btn>
                     <b-btn variant="danger">删除</b-btn>
                   </b-button-group>
                 </div>
+                <b-card-footer class="text-center">脚本运行结果</b-card-footer>
+				<iot-mini-terminal class="d-flex" :containerID="'scriptTerminal' + i" :id="'scriptTerminal' + i"/>
               </b-card>
             </b-row>
           </b-col>
@@ -60,6 +63,7 @@
 
 <script>
   import Terminal from '@components/ConsolePage/Terminal'
+  import ScriptTerminal from '@components/ConsolePage/ScriptTerminal'
   import CommConfigModal from '@components/ConsolePage/CommConfigModal'
   import {mapState} from 'vuex'
 
@@ -103,6 +107,7 @@
     },
     components: {
       'iot-terminal': Terminal,
+      'iot-mini-terminal': ScriptTerminal,
       'iot-comm-config': CommConfigModal
     }
   }

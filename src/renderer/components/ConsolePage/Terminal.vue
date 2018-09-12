@@ -23,6 +23,7 @@ Terminal.applyAddon(fit)
 export default {
   name: 'Console',
   props: [
+    'containerID',
     'pid'
   ],
   computed: {
@@ -109,7 +110,7 @@ export default {
       console.log('close')
     },
     setupTerminal () {
-      let terminalContainer = document.getElementById('terminal' + this.pid)
+      let terminalContainer = document.getElementById(this.containerID)
       this.term = new Terminal({
         rendererType: 'dom'
       })
