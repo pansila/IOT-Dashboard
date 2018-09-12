@@ -1,30 +1,38 @@
 <template>
   <div class="h-100">
     <b-card class="h-100" no-body>
-      <b-tabs class="h-100 my-d-flex" card>
-        <b-tab class="my-d-flex" no-body title="控制台" active>
-          <b-tabs pills card end class="my-d-flex">
+      <b-tabs class="h-100 my-d-flex-grow" card>
+        <b-tab class="my-d-flex-grow" no-body title="控制台" active>
+          <b-tabs pills card end class="my-d-flex-grow">
             <b-tab @contextmenu="onRightClick" no-body :title="commList[t]" v-for="(t, i) in tabs" :key="`console${t}`">
               <b-container fluid class="my-d-flex-grid">
                 <b-row class="flex-grow-1">
                   <b-col class="my-d-flex-grid p-0">
                     <my-terminal
                       :pid="i"
-                      class="my-d-flex"
+                      class="my-d-flex-grow"
                       :id="'terminal' + i" >
                     </my-terminal>
                   </b-col>
-                  <b-col cols="3" class="p-0">
-                    <b-card no-body>
-                      <b-card-header class="text-center">历史命令</b-card-header>
-                      <b-list-group>
-                        <b-list-group-item href="#"
-                          @click="onHistoryClick(i, j)"
-                          @dblclick="onHistoryDblClick(i)"
-                          v-for="(c, j) in terminals[i].history"
-                          :key="`${c}-${i}-${j}`">{{c}}</b-list-group-item>
-                      </b-list-group>
-                    </b-card>
+                  <b-col cols="3" class="my-d-flex">
+                    <b-row class="h-50">
+                      <b-card no-body class="flex-grow-1" style="overflow: auto;">
+                        <b-card-header class="text-center">历史命令</b-card-header>
+                        <b-list-group>
+                          <b-list-group-item href="#"
+                            @click="onHistoryClick(i, j)"
+                            @dblclick="onHistoryDblClick(i)"
+                            v-for="(c, j) in terminals[i].history"
+                            :key="`${c}-${i}-${j}`">{{c}}</b-list-group-item>
+                        </b-list-group>
+                      </b-card>
+                    </b-row>
+                    <b-row>
+                      <b-card no-body class="flex-grow-1">
+                        <b-card-header class="text-center">脚本</b-card-header>
+                        <b-card-img bottom src="https://picsum.photos/600/200/?image=23" />
+                      </b-card>
+                    </b-row>
                   </b-col>
                 </b-row>
               </b-container>
@@ -126,6 +134,9 @@
 </script>
 
 <style>
+/* .tab-content {
+  @extend .my-d-flex;
+} */
 .tab-content {
   display: flex;
   flex-direction: column;
@@ -141,6 +152,10 @@
   flex-grow: 1;
 }
 .my-d-flex {
+  display: flex;
+  flex-direction: column;
+}
+.my-d-flex-grow {
   display: flex;
   flex-direction: column;
   flex-grow: 1;
