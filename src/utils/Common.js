@@ -35,7 +35,7 @@ function LineParser (implicitCarriage, implicitLineFeed) {
     // console.log('lineparser before', line)
     // console.log('lineparser before', Buffer.from(line))
     // line = line.replace(/(?<!\r)\n\r(?!\n)/g, '\r\n')
-    line = line.replace(/([^\r]|^)\n\r/g, '$1\r\n')
+    line = line.replace(/((\r\n|\n\r)*?|.|^)\n\r/g, '$1\r\n')
     // console.log('lineparser 0', Buffer.from(line))
     if (implicitCarriage) line = line.replace(/((\r\n)+|[^\r]|^)\n($|[^\r]|(\r\n)+)/g, '$1\r\n$3')
     // console.log('lineparser 1', Buffer.from(line))

@@ -37,7 +37,7 @@
                   </b-button-group>
                 </div>
                 <b-card-footer class="text-center">脚本运行结果</b-card-footer>
-				<iot-mini-terminal class="d-flex" :containerID="'scriptTerminal' + i" :id="'scriptTerminal' + i"/>
+				        <iot-mini-terminal class="d-flex" :containerID="'scriptTerminal' + i" :id="'scriptTerminal' + i"/>
               </b-card>
             </b-row>
           </b-col>

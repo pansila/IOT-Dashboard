@@ -22,11 +22,11 @@ function createWindow () {
   mainWindow = new BrowserWindow({
     height: 563,
     useContentSize: true,
-    width: 1000
+    width: 1000,
     // autoHideMenuBar: true,
     // title: 'Vmail',
     // disableAutoHideCursor: true,
-    // frame: false // 没有边框
+    frame: false // 没有边框
   })
 
   mainWindow.loadURL(winURL)

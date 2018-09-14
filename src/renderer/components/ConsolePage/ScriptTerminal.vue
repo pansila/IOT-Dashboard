@@ -9,7 +9,7 @@
   import * as fit from 'xterm/lib/addons/fit/fit'
   import 'xterm/dist/xterm.css'
   import resizesensor from '@components/ResizeSensor'
-  import {spawn} from 'child_process'
+  import {execFile} from 'child_process'
 
   Terminal.applyAddon(fit)
 
@@ -26,7 +26,7 @@
     },
     methods: {
       execScript (scriptPath) {
-        const script = spawn('node', [scriptPath])
+        const script = execFile(process.execPath, [scriptPath])
 
         script.stdout.on('data', (data) => {
           console.log(`stdout: ${data}`)
@@ -47,13 +47,27 @@
         }
 
         let terminalContainer = document.getElementById(this.containerID)
-        console.log(terminalContainer, this.containerID)
         this.term = new Terminal({
           rendererType: 'dom'
         })
         this.term.open(terminalContainer)
         this.term.fit()
         this.term._initialized = true
+        this.term.on('key', (data) => {
+          const child = execFile(process.execPath, ['test.js'], (error, stdout, stderr) => {
+            if (error) {
+              throw error
+            }
+            console.log(child, process)
+            child.on('message', function (m) {
+              console.log('Yes it works!')
+            })
+            child.send({hello: 'world'})
+            console.log(stdout)
+            console.log(stderr)
+            this.term.write(data)
+          })
+        })
       }
     },
     beforeDestroy () {
