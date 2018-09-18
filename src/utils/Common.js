@@ -11,18 +11,20 @@ function PadMilliseconds (v) {
   return v
 }
 
+let newline = false
 function TimestampPrefix () {
   return through2.obj(function (line, _, next) {
-    let position = line.indexOf('\r\n')
-    // console.log(position, line)
-    if (position !== -1) {
+    // console.log(line, newline)
+    // console.log(Buffer.from(line))
+    if (newline) {
       let d = new Date()
       let timestamp = d.toTimeString().slice(0, 8) + '.' + PadMilliseconds(d.getMilliseconds()) + ': '
       timestamp = ansi.bold.open + ansi.grey.open + timestamp + ansi.grey.close + ansi.bold.close
-      this.push(line.slice(0, position + 2) + timestamp + line.slice(position + 2))
+      this.push(timestamp + line)
     } else {
       this.push(line)
     }
+    newline = line.endsWith('\r\n')
     next()
   }, done => done())
 }
@@ -50,17 +52,9 @@ function LineParser (implicitCarriage, implicitLineFeed) {
       data = data.slice(position + 2)
     }
     // console.log(Buffer.from(data))
-    this.push(data)
+    if (data !== '') this.push(data)
     next()
   }, done => done())
 }
 
-function LineBreaker () {
-  return through2.obj(function (line, _, next) {
-    line = line.replace(/[\r\n]+$/, '')
-    this.push('\r\n' + line)
-    next()
-  }, done => done())
-}
-
-export {TimestampPrefix, LineBreaker, LineParser}
+export {LineParser, TimestampPrefix}
