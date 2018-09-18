@@ -13,9 +13,10 @@ import 'xterm/dist/xterm.css'
 import resizesensor from '@components/ResizeSensor'
 import SerialPort from 'serialport'
 import Highlighter from '@utils/Highlighter'
-import {TimestampPrefix, LineParser} from '@utils/Common.js'
-// import {TimestampPrefix, LineBreaker, LineParser} from '@utils/Common.js'
+import {LineParser, TimestampPrefix} from '@utils/Common.js'
 import {PassThrough} from 'stream'
+import fs from 'fs'
+import path from 'path'
 
 Terminal.applyAddon(fit)
 // Terminal.applyAddon(attach)
@@ -66,37 +67,7 @@ export default {
       input: '',
       lookupHistory: false,
       // promptOffset: 0,
-      highlightOptions: {
-        highlightOptions: [
-          {
-            colorText: 'red.bold',
-            patternArray: ['error', 'fail', 'failed'],
-            modifiers: {}
-          },
-          {
-            colorText: 'yellow.bold',
-            patternArray: ['warn', 'warning'],
-            modifiers: {}
-          },
-          {
-            colorText: 'blue.bold',
-            patternArray: ['succeed', 'succeeded', 'successfully'],
-            modifiers: {}
-          },
-          {
-            colorText: 'green.bold',
-            patternArray: ['\\bstart', '\\bstop', '\\bcreate', '\\bcreated', '\\bcomplete', '\\bcompleted', '\\bfinish', '\\bfinished', '\\bend'],
-            modifiers: {}
-          },
-          {
-            colorText: 'bgBlue',
-            patternArray: ['\\d+(\\.\\d+){3}', '[0-9a-fA-F]{2}(:[0-9a-fA-F]{2}){3,5}', '0x[0-9a-fA-F]+'],
-            modifiers: {}
-          }
-        ],
-        caseSensitive: false,
-        defaultStyle: 'white'
-      }
+      highlightConfig: null
     }
   },
   methods: {
@@ -223,7 +194,6 @@ export default {
     },
     onResize (size) {
       if (this.term) {
-        // console.log('resize to fit:', size)
         this.term.fit()
         return
       }
@@ -235,9 +205,8 @@ export default {
 
           // const lineParser = new SerialPort.parsers.Readline({ delimiter: '\r\n' })
           const lineParser = LineParser(this.terminal.implicitCarriageEnabled, this.terminal.implicitLineFeedEnabled)
-          const highlighter = this.terminal.highlightEnabled ? Highlighter(this.highlightOptions) : new PassThrough()
+          const highlighter = this.terminal.highlightEnabled ? Highlighter(this.highlightConfig) : new PassThrough()
           const timestampPrefix = this.terminal.timestampEnabled ? TimestampPrefix() : new PassThrough()
-          // const lineBreaker = this.terminal.implicitCarriageEnabled ? LineBreaker() : new PassThrough()
 
           port.on('close', e => { this.serialport = null; console.log('Close', e) })
           port.on('error', alert)
@@ -245,7 +214,6 @@ export default {
             .pipe(lineParser)
             .pipe(highlighter)
             .pipe(timestampPrefix)
-            // .pipe(lineBreaker)
             .on('data', data => {
               // console.log(Array.from(data).map(ch => ch.charCodeAt()))
               this.term.write(data)
@@ -255,7 +223,8 @@ export default {
     }
   },
   mounted () {
-    // this.setupTerminal()
+    let content = fs.readFileSync(path.join(__static, '/highlight.json'))
+    this.highlightConfig = JSON.parse(content)
   },
   beforeDestroy () {
     // this.term.detach(this.terminalSocket)

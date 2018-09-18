@@ -1,0 +1,32 @@
+{
+  "highlightOptions": [
+    {
+      "colorText": "red.bold",
+      "patternArray": ["error", "fail", "failed"],
+      "modifiers": {}
+    },
+    {
+      "colorText": "yellow.bold",
+      "patternArray": ["warn", "warning"],
+      "modifiers": {}
+    },
+    {
+      "colorText": "blue.bold",
+      "patternArray": ["succeed", "succeeded", "successfully"],
+      "modifiers": {}
+    },
+    {
+      "colorText": "green.bold",
+      "patternArray": ["\\bstart", "\\bstop", "\\bcreate", "\\bcreated", "\\bcomplete", "\\bcompleted", "\\bfinish", "\\bfinished", "\\bend"],
+      "modifiers": {}
+    },
+    {
+      "colorText": "bgBlue",
+      "patternArray": ["\\d+(\\.\\d+){3}", "[0-9a-fA-F]{2}(:[0-9a-fA-F]{2}){3,5}", "0x[0-9a-fA-F]+"],
+      "modifiers": {}
+    }
+  ],
+  "caseSensitive": false,
+  "defaultStyle": "white",
+  "timestampStyle": "grey.bold"
+}
