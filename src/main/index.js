@@ -1,8 +1,8 @@
 'use strict'
 
 import { app, BrowserWindow, ipcMain } from 'electron'
-import fs from 'fs'
 import path from 'path'
+import {spawn} from 'child_process'
 
 /**
  * Set `__static` path to static files in production
@@ -35,9 +35,6 @@ function createWindow () {
 
   mainWindow.maximize()
 
-  mainWindow.on('resize', (e) => {
-    console.log('window resize')
-  })
   mainWindow.on('closed', () => {
     mainWindow = null
   })
@@ -57,36 +54,29 @@ app.on('activate', () => {
   }
 })
 
+function runScript (caller, script) {
+  let scriptPath = path.join(__static, 'scripts')
+  const child = spawn(process.execPath, [path.join(scriptPath, script)], {stdio: [0, 1, 2, 'ipc']}, (error, stdout, stderr) => {
+    if (error) {
+      throw error
+    }
+    // console.log(stdout)
+    // console.log(stderr)
+  })
+  child.on('message', function (m) {
+    console.log('Yes it works!')
+    caller.send('asynchronous-reply', m)
+  })
+  child.send({hello: 'world'})
+}
+
 ipcMain.on('asynchronous-message', (event, arg) => {
-  function attachSandbox () {
-    let context = {
-      stdout: console.log
-    }
-    console.log = function (val) {
-      event.sender.send('asynchronous-reply', {
-        script: {
-          type: 'result',
-          value: val
-        }
-      })
-    }
-
-    return context
-  }
-
-  function detachSandbox (context) {
-    if (context.stdout) console.log = context.stdout
-  }
-
   // console.log(arg)
   if (arg.script) {
-    let scriptPath = path.join(__static, 'scripts')
-    switch (arg.script.command) {
+    let {command, value} = arg.script
+    switch (command) {
       case 'run':
-        let content = fs.readFileSync(path.join(scriptPath, arg.script.value))
-        let context = attachSandbox()
-        eval(content.toString())
-        detachSandbox(context)
+        runScript(event.sender, value)
         break
       default:
         console.log('unknown script command')

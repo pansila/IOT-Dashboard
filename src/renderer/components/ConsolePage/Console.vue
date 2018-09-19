@@ -94,10 +94,16 @@
     mounted () {
       let scriptPath = path.join(__static, '/scripts')
       fs.readdir(scriptPath, (err, files) => {
-        if (err) alert(err)
+        if (err) {
+          alert(err)
+          return
+        }
         files.forEach(file => {
           fs.stat(path.join(scriptPath, file), (err, stats) => {
-            if (err) alert(err)
+            if (err) {
+              alert(err)
+              return
+            }
             if (stats.isFile()) {
               if (file.endsWith('.js')) file = file.slice(0, -3)
               this.scripts.push(file)
@@ -106,12 +112,8 @@
         })
       })
 
-      ipcRenderer.on('asynchronous-reply', (event, arg) => {
-        if (arg.script) {
-          if (arg.script.type === 'result') {
-            this.eventHub.$emit('SCRIPT_OUTPUT', arg.script.value)
-          }
-        }
+      ipcRenderer.on('asynchronous-reply', (event, value) => {
+        this.eventHub.$emit('SCRIPT_OUTPUT', value)
       })
 
       this.eventHub.$on('SCRIPT_INPUT', console.log)
