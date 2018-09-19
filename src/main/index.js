@@ -64,10 +64,12 @@ function runScript (caller, script) {
     // console.log(stderr)
   })
   child.on('message', function (m) {
-    console.log('Yes it works!')
     caller.send('asynchronous-reply', m)
   })
-  child.send({hello: 'world'})
+  child.on('disconnect', function (m) {
+    caller.send('asynchronous-reply', `script ${script} exits`)
+  })
+  // child.send({hello: 'world'})
 }
 
 ipcMain.on('asynchronous-message', (event, arg) => {
