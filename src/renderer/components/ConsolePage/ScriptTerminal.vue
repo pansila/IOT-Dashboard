@@ -16,7 +16,8 @@
   export default {
     name: 'miniTerminal',
     props: [
-      'containerID'
+      'containerID',
+      'eventHub'
     ],
     data () {
       return {
@@ -54,20 +55,9 @@
         this.term.fit()
         this.term._initialized = true
         this.term.on('key', (data) => {
-          const child = execFile(process.execPath, ['test.js'], (error, stdout, stderr) => {
-            if (error) {
-              throw error
-            }
-            console.log(child, process)
-            child.on('message', function (m) {
-              console.log('Yes it works!')
-            })
-            child.send({hello: 'world'})
-            console.log(stdout)
-            console.log(stderr)
-            this.term.write(data)
-          })
+          this.term.write(data)
         })
+        this.eventHub.$on('SCRIPT_OUTPUT', e => this.term.writeln(e))
       }
     },
     beforeDestroy () {

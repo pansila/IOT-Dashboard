@@ -29,15 +29,18 @@
                 <div class="m-2 iot-d-flex">
                   <b-form-select v-model="scriptSelected" :options="scripts" class="mb-2" />
                   <b-button-group size="sm">
-                    <b-btn class="flex-grow-1" variant="primary">运行</b-btn>
-                    <b-btn class="flex-grow-1" variant="warning">停止</b-btn>
-                    <b-btn class="">编辑</b-btn>
-                    <b-btn class="">添加</b-btn>
-                    <b-btn variant="danger">删除</b-btn>
+                    <b-btn class="flex-grow-1" variant="primary" @click="onRunScript">运行</b-btn>
+                    <b-btn class="flex-grow-1" variant="warning" @click="onStopScript">停止</b-btn>
+                    <b-btn class="" @click="onEditScript">编辑</b-btn>
+                    <b-btn class="" @click="onAddScript">添加</b-btn>
+                    <b-btn variant="danger" @click="onDeleteScript">删除</b-btn>
                   </b-button-group>
                 </div>
                 <b-card-footer class="text-center">脚本运行结果</b-card-footer>
-				        <iot-mini-terminal class="d-flex" :containerID="'scriptTerminal' + i" :id="'scriptTerminal' + i"/>
+				        <iot-mini-terminal class="d-flex"
+                  :containerID="'scriptTerminal' + i"
+                  :id="'scriptTerminal' + i"
+                  :eventHub="eventHub"/>
               </b-card>
             </b-row>
           </b-col>
@@ -66,19 +69,19 @@
   import ScriptTerminal from '@components/ConsolePage/ScriptTerminal'
   import CommConfigModal from '@components/ConsolePage/CommConfigModal'
   import {mapState} from 'vuex'
+  import {ipcRenderer} from 'electron'
+  import fs from 'fs'
+  import path from 'path'
+  import Vue from 'vue'
 
   export default {
     name: 'consolePage',
     data () {
       return {
         tabCounter: 0,
-        scripts: [
-          { value: '1', text: 'test1 for abc' },
-          { value: '2', text: 'test2 for abc' },
-          { value: '3', text: 'test3 for abc' },
-          { value: '4', text: 'test4 for abc' }
-        ],
-        scriptSelected: 0
+        scripts: [],
+        scriptSelected: 0,
+        eventHub: new Vue()
       }
     },
     computed: {
@@ -89,6 +92,29 @@
       })
     },
     mounted () {
+      let scriptPath = path.join(__static, '/scripts')
+      fs.readdir(scriptPath, (err, files) => {
+        if (err) alert(err)
+        files.forEach(file => {
+          fs.stat(path.join(scriptPath, file), (err, stats) => {
+            if (err) alert(err)
+            if (stats.isFile()) {
+              if (file.endsWith('.js')) file = file.slice(0, -3)
+              this.scripts.push(file)
+            }
+          })
+        })
+      })
+
+      ipcRenderer.on('asynchronous-reply', (event, arg) => {
+        if (arg.script) {
+          if (arg.script.type === 'result') {
+            this.eventHub.$emit('SCRIPT_OUTPUT', arg.script.value)
+          }
+        }
+      })
+
+      this.eventHub.$on('SCRIPT_INPUT', console.log)
     },
     methods: {
       closeTab (i) {
@@ -103,6 +129,23 @@
       },
       onRightClick (e) {
         console.log(e)
+      },
+      onRunScript (e) {
+        if (!this.scriptSelected) return
+        ipcRenderer.send('asynchronous-message', {
+          script: {
+            command: 'run',
+            value: this.scriptSelected + '.js'
+          }
+        })
+      },
+      onStopScript (e) {
+      },
+      onEditScript (e) {
+      },
+      onAddScript (e) {
+      },
+      onDeleteScript (e) {
       }
     },
     components: {

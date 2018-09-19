@@ -1,6 +1,8 @@
 'use strict'
 
-import { app, BrowserWindow } from 'electron'
+import { app, BrowserWindow, ipcMain } from 'electron'
+import fs from 'fs'
+import path from 'path'
 
 /**
  * Set `__static` path to static files in production
@@ -53,6 +55,49 @@ app.on('activate', () => {
   if (mainWindow === null) {
     createWindow()
   }
+})
+
+ipcMain.on('asynchronous-message', (event, arg) => {
+  function attachSandbox () {
+    let context = {
+      stdout: console.log
+    }
+    console.log = function (val) {
+      event.sender.send('asynchronous-reply', {
+        script: {
+          type: 'result',
+          value: val
+        }
+      })
+    }
+
+    return context
+  }
+
+  function detachSandbox (context) {
+    if (context.stdout) console.log = context.stdout
+  }
+
+  // console.log(arg)
+  if (arg.script) {
+    let scriptPath = path.join(__static, 'scripts')
+    switch (arg.script.command) {
+      case 'run':
+        let content = fs.readFileSync(path.join(scriptPath, arg.script.value))
+        let context = attachSandbox()
+        eval(content.toString())
+        detachSandbox(context)
+        break
+      default:
+        console.log('unknown script command')
+    }
+  }
+  // event.sender.send('asynchronous-reply', arg)
+})
+
+ipcMain.on('synchronous-message', (event, arg) => {
+  // console.log(arg)
+  event.returnValue = arg
 })
 
 /**
