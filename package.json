@@ -1,6 +1,6 @@
 {
   "name": "IOT-Dashboard",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "author": "Pansila <panzilla@163.com>",
   "description": "A debug tool helping with WiFi IOT development",
   "license": "MIT",
@@ -30,6 +30,9 @@
     },
     "files": [
       "dist/electron/**/*"
+    ],
+    "asarUnpack": [
+      "dist/electron/static/**/*"
     ],
     "dmg": {
       "contents": [
