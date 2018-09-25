@@ -55,8 +55,9 @@ app.on('activate', () => {
 })
 
 function runScript (caller, script) {
-  let scriptPath = path.join(__static, 'scripts')
-  const child = spawn(process.execPath, [path.join(scriptPath, script)], {stdio: [0, 1, 2, 'ipc']}, (error, stdout, stderr) => {
+  // let scriptPath = path.join(__static, 'scripts')
+  // const child = spawn(process.execPath, [path.join(scriptPath, script)], {stdio: [0, 1, 2, 'ipc']}, (error, stdout, stderr) => {
+  const child = spawn(process.execPath, [path.join(__static, 'runner.js')], {stdio: [0, 1, 2, 'ipc']}, (error, stdout, stderr) => {
     if (error) {
       throw error
     }
@@ -64,12 +65,16 @@ function runScript (caller, script) {
     // console.log(stderr)
   })
   child.on('message', function (m) {
-    caller.send('asynchronous-reply', m)
+    if (m.type && m.type === 'terminal') {
+      caller.send('asynchronous-reply', m.data)
+    } else if (m.type && m.type === 'log') {
+      caller.send('asynchronous-reply', m.data)
+    }
   })
-  child.on('disconnect', function (m) {
-    caller.send('asynchronous-reply', `script ${script} exits`)
-  })
-  // child.send({hello: 'world'})
+  // child.on('disconnect', function (m) {
+  //   caller.send('asynchronous-reply', `script ${script} exits`)
+  // })
+  child.send(script)
 }
 
 ipcMain.on('asynchronous-message', (event, arg) => {

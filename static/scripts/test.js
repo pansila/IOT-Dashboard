@@ -1,7 +1,9 @@
-console.log('hello world')
-setTimeout(() => console.log('hello kitty'), 1000)
+// console.log('hello world')
+printfTerm('hello world')
 
-process.send('hello world')
+// process.send('hello world')
+printfLog('hello kitty')
 
-process.disconnect()
-process.exit()
+exit()
+// process.disconnect()
+// process.exit()
