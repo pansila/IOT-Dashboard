@@ -115,10 +115,13 @@
       })
 
       ipcRenderer.on('asynchronous-reply', (event, value) => {
-        if (value.type && value.type === 'terminal') {
-          this.terminalEventHub.$emit('SCRIPT_OUTPUT', value.data)
-        } else if (value.type && value.type === 'log') {
-          this.scriptEventHub.$emit('SCRIPT_OUTPUT', value.data)
+        if (value.type) {
+          let {type, data} = value
+          if (type === 'terminal') {
+            this.terminalEventHub.$emit('SCRIPT_OUTPUT', data)
+          } else if (type === 'log') {
+            this.scriptEventHub.$emit('SCRIPT_OUTPUT', data)
+          }
         }
       })
 
@@ -149,6 +152,13 @@
         })
       },
       onStopScript (e) {
+        if (!this.scriptSelected) return
+        ipcRenderer.send('asynchronous-message', {
+          script: {
+            command: 'stop',
+            value: this.scriptSelected + '.js'
+          }
+        })
       },
       onEditScript (e) {
       },

@@ -28,7 +28,7 @@ function createWindow () {
     // autoHideMenuBar: true,
     // title: 'Vmail',
     // disableAutoHideCursor: true,
-    frame: false // 没有边框
+    frame: false
   })
 
   mainWindow.loadURL(winURL)
@@ -54,9 +54,8 @@ app.on('activate', () => {
   }
 })
 
+let children = []
 function runScript (caller, script) {
-  // let scriptPath = path.join(__static, 'scripts')
-  // const child = spawn(process.execPath, [path.join(scriptPath, script)], {stdio: [0, 1, 2, 'ipc']}, (error, stdout, stderr) => {
   const child = spawn(process.execPath, [path.join(__static, 'runner.js')], {stdio: [0, 1, 2, 'ipc']}, (error, stdout, stderr) => {
     if (error) {
       throw error
@@ -66,25 +65,39 @@ function runScript (caller, script) {
   })
   child.on('message', function (m) {
     caller.send('asynchronous-reply', m)
-    // if (m.type && m.type === 'terminal') {
-    //   caller.send('asynchronous-reply', m.data)
-    // } else if (m.type && m.type === 'log') {
-    //   caller.send('asynchronous-reply', m.data)
-    // }
   })
-  // child.on('disconnect', function (m) {
-  //   caller.send('asynchronous-reply', `script ${script} exits`)
-  // })
+  child.on('disconnect', function (m) {
+    // caller.send('asynchronous-reply', `script ${script} exits`)
+    stopScript(caller, script)
+  })
   child.send(script)
+
+  return child
+}
+
+function stopScript (caller, scriptName) {
+  let found
+  children.forEach((c, i) => {
+    if (c.name === scriptName) {
+      found = i
+    }
+  })
+  if (found !== undefined) {
+    process.kill(children[found].child.pid, 'SIGINT')
+    children.splice(found, 1)
+  }
 }
 
 ipcMain.on('asynchronous-message', (event, arg) => {
-  // console.log(arg)
   if (arg.script) {
     let {command, value} = arg.script
     switch (command) {
       case 'run':
-        runScript(event.sender, value)
+        let child = runScript(event.sender, value)
+        children.push({name: value, child: child})
+        break
+      case 'stop':
+        stopScript(event.sender, value)
         break
       default:
         console.log('unknown script command')
@@ -94,7 +107,6 @@ ipcMain.on('asynchronous-message', (event, arg) => {
 })
 
 ipcMain.on('synchronous-message', (event, arg) => {
-  // console.log(arg)
   event.returnValue = arg
 })
 
