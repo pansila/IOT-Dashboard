@@ -65,11 +65,12 @@ function runScript (caller, script) {
     // console.log(stderr)
   })
   child.on('message', function (m) {
-    if (m.type && m.type === 'terminal') {
-      caller.send('asynchronous-reply', m.data)
-    } else if (m.type && m.type === 'log') {
-      caller.send('asynchronous-reply', m.data)
-    }
+    caller.send('asynchronous-reply', m)
+    // if (m.type && m.type === 'terminal') {
+    //   caller.send('asynchronous-reply', m.data)
+    // } else if (m.type && m.type === 'log') {
+    //   caller.send('asynchronous-reply', m.data)
+    // }
   })
   // child.on('disconnect', function (m) {
   //   caller.send('asynchronous-reply', `script ${script} exits`)

@@ -21,6 +21,7 @@
     ],
     data () {
       return {
+        term: null
       }
     },
     mounted () {

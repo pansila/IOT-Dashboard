@@ -25,7 +25,8 @@ export default {
   name: 'Console',
   props: [
     'containerID',
-    'pid'
+    'pid',
+    'eventHub'
   ],
   computed: {
     ...mapState({
@@ -218,6 +219,10 @@ export default {
               // console.log(Array.from(data).map(ch => ch.charCodeAt()))
               this.term.write(data)
             })
+          this.eventHub.$on('SCRIPT_OUTPUT', e => {
+            // this.term.writeln(e)
+            this.serialport.write(e + '\r')
+          })
         })
         .catch(console.log)
     }

@@ -1,9 +1,4 @@
-// console.log('hello world')
-printfTerm('hello world')
-
-// process.send('hello world')
-printfLog('hello kitty')
+printfLog('start to scan networks')
+printfTerm('wifi_scan')
 
 exit()
-// process.disconnect()
-// process.exit()

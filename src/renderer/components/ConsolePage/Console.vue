@@ -8,7 +8,8 @@
               :pid="i"
               class="iot-d-flex-grow"
               :containerID="'terminal' + i" 
-              :id="'terminal' + i" />
+              :id="'terminal' + i"
+              :eventHub="terminalEventHub" />
           </b-col>
           <b-col cols="3" class="iot-d-flex">
             <b-row class="h-50">
@@ -40,7 +41,7 @@
 				        <iot-mini-terminal class="d-flex"
                   :containerID="'scriptTerminal' + i"
                   :id="'scriptTerminal' + i"
-                  :eventHub="eventHub"/>
+                  :eventHub="scriptEventHub"/>
               </b-card>
             </b-row>
           </b-col>
@@ -81,7 +82,8 @@
         tabCounter: 0,
         scripts: [],
         scriptSelected: 0,
-        eventHub: new Vue()
+        terminalEventHub: new Vue(),
+        scriptEventHub: new Vue()
       }
     },
     computed: {
@@ -113,10 +115,15 @@
       })
 
       ipcRenderer.on('asynchronous-reply', (event, value) => {
-        this.eventHub.$emit('SCRIPT_OUTPUT', value)
+        if (value.type && value.type === 'terminal') {
+          this.terminalEventHub.$emit('SCRIPT_OUTPUT', value.data)
+        } else if (value.type && value.type === 'log') {
+          this.scriptEventHub.$emit('SCRIPT_OUTPUT', value.data)
+        }
       })
 
-      this.eventHub.$on('SCRIPT_INPUT', console.log)
+      this.scriptEventHub.$on('SCRIPT_INPUT', console.log)
+      this.terminalEventHub.$on('SCRIPT_INPUT', console.log)
     },
     methods: {
       closeTab (i) {
