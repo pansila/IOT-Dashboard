@@ -1,10 +1,10 @@
 const fs = require('fs')
 const path = require('path')
 
-let runningScript
+let script
 
 function exit () {
-  printfLog('<= exit the script "' + runningScript.slice(0, -3) + '"')
+  printfLog('<= script "' + script.slice(0, -3) + '" exits')
   process.disconnect()
   process.exit()
 }
@@ -19,14 +19,12 @@ function printfTerm (data) {
 
 process.on('message', function (m) {
   let content
-  let {env, script} = m
-  printfLog('\n=> start the script "' + script.slice(0, -3) + '"')
-  // console.log(script)
-  if (env === 'production') {
-    content = fs.readFileSync(path.join(__dirname, 'scripts', script))
-  } else {
-    content = fs.readFileSync(path.join('static/scripts', script))
+  let {type, value} = m
+  if (type === 'script') {
+    printfLog('\n=> start the script "' + value.slice(0, -3) + '"')
+    // console.log(value)
+    content = fs.readFileSync(path.join(__dirname, 'scripts', value))
+    script = value
+    eval(content.toString())
   }
-  runningScript = script
-  eval(content.toString())
 })

@@ -24,7 +24,7 @@
   },
   "build": {
     "productName": "IOT Dashboard",
-    "appId": "org.simulatedgreg.electron-vue",
+    "appId": "io.github.pansila",
     "directories": {
       "output": "build"
     },

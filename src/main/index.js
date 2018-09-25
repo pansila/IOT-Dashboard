@@ -71,7 +71,7 @@ function runScript (caller, script) {
   child.on('disconnect', function (m) {
     stopScript(caller, script, false)
   })
-  child.send({env: process.env.NODE_ENV, script: script})
+  child.send({type: 'script', value: script})
 
   return child
 }
