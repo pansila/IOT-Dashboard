@@ -2,7 +2,8 @@
 
 import { app, BrowserWindow, ipcMain } from 'electron'
 import path from 'path'
-import {spawn} from 'child_process'
+// import {spawn} from 'child_process'
+import {fork} from 'child_process'
 
 /**
  * Set `__static` path to static files in production
@@ -56,7 +57,8 @@ app.on('activate', () => {
 
 let children = []
 function runScript (caller, script) {
-  const child = spawn(process.execPath, [path.join(__static, 'runner.js')], {stdio: [0, 1, 2, 'ipc']}, (error, stdout, stderr) => {
+  // const child = spawn(process.execPath, [path.join(__static, 'runner.js')], {stdio: [0, 1, 2, 'ipc']}, (error, stdout, stderr) => {
+  const child = fork(path.join(__static, 'runner.js'), {stdio: [0, 1, 2, 'ipc']}, (error, stdout, stderr) => {
     if (error) {
       throw error
     }
@@ -67,15 +69,14 @@ function runScript (caller, script) {
     caller.send('asynchronous-reply', m)
   })
   child.on('disconnect', function (m) {
-    // caller.send('asynchronous-reply', `script ${script} exits`)
-    stopScript(caller, script)
+    stopScript(caller, script, false)
   })
-  child.send(script)
+  child.send({env: process.env.NODE_ENV, script: script})
 
   return child
 }
 
-function stopScript (caller, scriptName) {
+function stopScript (caller, scriptName, kill) {
   let found
   children.forEach((c, i) => {
     if (c.name === scriptName) {
@@ -83,7 +84,7 @@ function stopScript (caller, scriptName) {
     }
   })
   if (found !== undefined) {
-    process.kill(children[found].child.pid, 'SIGINT')
+    if (kill) process.kill(children[found].child.pid, 'SIGINT')
     children.splice(found, 1)
   }
 }
@@ -97,7 +98,8 @@ ipcMain.on('asynchronous-message', (event, arg) => {
         children.push({name: value, child: child})
         break
       case 'stop':
-        stopScript(event.sender, value)
+        event.sender.send('asynchronous-reply', {type: 'log', data: '<= stop the script "' + value.slice(0, -3) + '"'})
+        stopScript(event.sender, value, true)
         break
       default:
         console.log('unknown script command')
