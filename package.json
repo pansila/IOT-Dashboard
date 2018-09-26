@@ -1,6 +1,6 @@
 {
   "name": "IOT-Dashboard",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "author": "Pansila <panzilla@163.com>",
   "description": "A debug tool helping with WiFi IOT development",
   "license": "MIT",
@@ -62,6 +62,7 @@
   "dependencies": {
     "ansi-styles": "^3.2.1",
     "axios": "^0.16.1",
+    "babel-preset-env": "^1.6.0",
     "babel-preset-stage-3": "^6.24.1",
     "babel-register": "^6.24.1",
     "bootstrap-vue": "^2.0.0-rc.11",
@@ -79,7 +80,6 @@
     "babel-loader": "^7.1.1",
     "babel-plugin-istanbul": "^4.1.1",
     "babel-plugin-transform-runtime": "^6.23.0",
-    "babel-preset-env": "^1.6.0",
     "babel-preset-stage-0": "^6.24.1",
     "babili-webpack-plugin": "^0.1.2",
     "cfonts": "^1.1.3",
