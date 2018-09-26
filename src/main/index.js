@@ -80,6 +80,18 @@ function stopScript (caller, scriptName, kill) {
   }
 }
 
+function send2Script (caller, scriptName, data) {
+  let found
+  children.forEach((c, i) => {
+    if (c.name === scriptName) {
+      found = i
+    }
+  })
+  if (found !== undefined) {
+    children[found].child.send({type: 'listen-keyword-result', value: data})
+  }
+}
+
 ipcMain.on('asynchronous-message', (event, arg) => {
   if (arg.script) {
     let {command, value} = arg.script
@@ -91,6 +103,9 @@ ipcMain.on('asynchronous-message', (event, arg) => {
       case 'stop':
         event.sender.send('asynchronous-reply', {type: 'log', data: '<= stop the script "' + value.slice(0, -3) + '"'})
         stopScript(event.sender, value, true)
+        break
+      case 'listen-keyword-result':
+        send2Script(event.sender, 'test.js', arg.script.data)
         break
       default:
         console.log('unknown script command')

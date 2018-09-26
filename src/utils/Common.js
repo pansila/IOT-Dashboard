@@ -57,4 +57,35 @@ function LineParser (implicitCarriage, implicitLineFeed) {
   }, done => done())
 }
 
-export {LineParser, TimestampPrefix}
+class KeywordFilter {
+  constructor () {
+    this.keywords = []
+    let _this = this
+    this.piper = through2.obj(function (line, _, next) {
+      _this.keywords.forEach(kw => {
+        if (kw.test(line)) {
+          _this.listenPromise(line)
+        }
+      })
+      this.push(line)
+      next()
+    }, done => done())
+  }
+
+  listen () {
+    return new Promise((resolve, reject) => {
+      this.listenPromise = resolve
+    })
+  }
+
+  keywordInstall (keyword) {
+    let regexp = new RegExp(keyword)
+    this.keywords.push(regexp)
+  }
+
+  keywordUninstall (keyword) {
+  // this.keywords.push(regexp)
+  }
+}
+
+export {LineParser, TimestampPrefix, KeywordFilter}

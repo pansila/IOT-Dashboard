@@ -117,16 +117,31 @@
       ipcRenderer.on('asynchronous-reply', (event, value) => {
         if (value.type) {
           let {type, data} = value
-          if (type === 'terminal') {
-            this.terminalEventHub.$emit('SCRIPT_OUTPUT', data)
-          } else if (type === 'log') {
-            this.scriptEventHub.$emit('SCRIPT_OUTPUT', data)
+          switch (type) {
+            case 'terminal':
+              this.terminalEventHub.$emit('SCRIPT_OUTPUT', data)
+              break
+            case 'log':
+              this.scriptEventHub.$emit('SCRIPT_OUTPUT', data)
+              break
+            case 'listen-keyword':
+              this.terminalEventHub.$emit('LISTEN_KEYWORD', data)
+              break
           }
         }
       })
 
       this.scriptEventHub.$on('SCRIPT_INPUT', console.log)
       this.terminalEventHub.$on('SCRIPT_INPUT', console.log)
+      this.terminalEventHub.$on('LISTEN_KEYWORD_RESULT', d => {
+        ipcRenderer.send('asynchronous-message', {
+          script: {
+            command: 'listen-keyword-result',
+            value: d,
+            data: d
+          }
+        })
+      })
     },
     methods: {
       closeTab (i) {

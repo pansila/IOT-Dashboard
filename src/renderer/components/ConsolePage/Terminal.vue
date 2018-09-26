@@ -13,7 +13,7 @@ import 'xterm/dist/xterm.css'
 import resizesensor from '@components/ResizeSensor'
 import SerialPort from 'serialport'
 import Highlighter from '@utils/Highlighter'
-import {LineParser, TimestampPrefix} from '@utils/Common.js'
+import {LineParser, TimestampPrefix, KeywordFilter} from '@utils/Common.js'
 import {PassThrough} from 'stream'
 import fs from 'fs'
 import path from 'path'
@@ -208,20 +208,31 @@ export default {
           const lineParser = LineParser(this.terminal.implicitCarriageEnabled, this.terminal.implicitLineFeedEnabled)
           const highlighter = this.terminal.highlightEnabled ? Highlighter(this.highlightConfig) : new PassThrough()
           const timestampPrefix = this.terminal.timestampEnabled ? TimestampPrefix() : new PassThrough()
+          const keywordFilter = new KeywordFilter()
 
           port.on('close', e => { this.serialport = null; console.log('Close', e) })
           port.on('error', alert)
           port
             .pipe(lineParser)
+            .pipe(keywordFilter.piper)
             .pipe(highlighter)
             .pipe(timestampPrefix)
             .on('data', data => {
               // console.log(Array.from(data).map(ch => ch.charCodeAt()))
               this.term.write(data)
             })
+
           this.eventHub.$on('SCRIPT_OUTPUT', e => {
             // this.term.writeln(e)
             this.serialport.write(e + '\r')
+          })
+          this.eventHub.$on('LISTEN_KEYWORD', e => {
+            keywordFilter.keywordInstall(e)
+            keywordFilter.listen().then(x => {
+              this.eventHub.$emit('LISTEN_KEYWORD_RESULT', x)
+            }).catch(x => {
+              this.eventHub.$emit('LISTEN_KEYWORD_RESULT', null)
+            })
           })
         })
         .catch(console.log)
