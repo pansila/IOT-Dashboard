@@ -13,7 +13,7 @@ import 'xterm/dist/xterm.css'
 import resizesensor from '@components/ResizeSensor'
 import SerialPort from 'serialport'
 import Highlighter from '@utils/Highlighter'
-import {LineParser, TimestampPrefix, KeywordFilter} from '@utils/Common.js'
+import {LineBreaker, LineParser, TimestampPrefix, KeywordFilter} from '@utils/Common.js'
 import {PassThrough} from 'stream'
 import fs from 'fs'
 import path from 'path'
@@ -205,7 +205,8 @@ export default {
           this.setupTerminal()
 
           // const lineParser = new SerialPort.parsers.Readline({ delimiter: '\r\n' })
-          const lineParser = LineParser(this.terminal.implicitCarriageEnabled, this.terminal.implicitLineFeedEnabled)
+          const lineBreaker = LineBreaker(this.terminal.implicitCarriageEnabled, this.terminal.implicitLineFeedEnabled)
+          const lineParser = LineParser()
           const highlighter = this.terminal.highlightEnabled ? Highlighter(this.highlightConfig) : new PassThrough()
           const timestampPrefix = this.terminal.timestampEnabled ? TimestampPrefix() : new PassThrough()
           const keywordFilter = new KeywordFilter()
@@ -213,10 +214,11 @@ export default {
           port.on('close', e => { this.serialport = null; console.log('Close', e) })
           port.on('error', alert)
           port
+            .pipe(lineBreaker)
+            .pipe(timestampPrefix)
             .pipe(lineParser)
             .pipe(keywordFilter.piper)
             .pipe(highlighter)
-            .pipe(timestampPrefix)
             .on('data', data => {
               // console.log(Array.from(data).map(ch => ch.charCodeAt()))
               this.term.write(data)

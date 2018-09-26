@@ -29,7 +29,7 @@ function TimestampPrefix () {
   }, done => done())
 }
 
-function LineParser (implicitCarriage, implicitLineFeed) {
+function LineBreaker (implicitCarriage, implicitLineFeed) {
   return through2.obj(function (line, _, next) {
     let position
     line = line.toString()
@@ -53,6 +53,26 @@ function LineParser (implicitCarriage, implicitLineFeed) {
     }
     // console.log(Buffer.from(data))
     if (data !== '') this.push(data)
+    next()
+  }, done => done())
+}
+
+let buffer = ''
+/* Assemble the words resulting of serial port output delay to make a line */
+function LineParser () {
+  return through2.obj(function (line, _, next) {
+    if (line.endsWith('\r\n')) {
+      this.push(buffer + line)
+      buffer = ''
+    } else {
+      setTimeout(() => {
+        if (buffer !== '') {
+          this.push(buffer)
+          buffer = ''
+        }
+      }, 10)
+      buffer += line
+    }
     next()
   }, done => done())
 }
@@ -88,4 +108,4 @@ class KeywordFilter {
   }
 }
 
-export {LineParser, TimestampPrefix, KeywordFilter}
+export {LineBreaker, LineParser, TimestampPrefix, KeywordFilter}
