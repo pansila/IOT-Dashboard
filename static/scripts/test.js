@@ -1,9 +1,13 @@
-printfLog('start to scan networks')
-printfTerm('wifi_scan')
+import {print2log, print2term, exit, sleep} from '../test-helper'
 
-setTimeout(x => {
-  console.log('test')
+async function start () {
+  print2log('start to scan networks')
+  print2term('wifi_scan')
+
+  await sleep(10000)
+
+  print2log('scan done')
   exit()
-}, 10000)
+}
 
-// exit()
+start()

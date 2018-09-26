@@ -2,7 +2,6 @@
 
 import { app, BrowserWindow, ipcMain } from 'electron'
 import path from 'path'
-// import {spawn} from 'child_process'
 import {fork} from 'child_process'
 
 /**
@@ -27,7 +26,6 @@ function createWindow () {
     useContentSize: true,
     width: 1000,
     // autoHideMenuBar: true,
-    // title: 'Vmail',
     // disableAutoHideCursor: true,
     frame: false
   })
@@ -57,14 +55,7 @@ app.on('activate', () => {
 
 let children = []
 function runScript (caller, script) {
-  // const child = spawn(process.execPath, [path.join(__static, 'runner.js')], {stdio: [0, 1, 2, 'ipc']}, (error, stdout, stderr) => {
-  const child = fork(path.join(__static, 'runner.js'), {stdio: [0, 1, 2, 'ipc']}, (error, stdout, stderr) => {
-    if (error) {
-      throw error
-    }
-    // console.log(stdout)
-    // console.log(stderr)
-  })
+  const child = fork(path.join(__static, 'test-runner.js'), {stdio: [0, 1, 2, 'ipc']})
   child.on('message', function (m) {
     caller.send('asynchronous-reply', m)
   })
@@ -105,11 +96,6 @@ ipcMain.on('asynchronous-message', (event, arg) => {
         console.log('unknown script command')
     }
   }
-  // event.sender.send('asynchronous-reply', arg)
-})
-
-ipcMain.on('synchronous-message', (event, arg) => {
-  event.returnValue = arg
 })
 
 /**
