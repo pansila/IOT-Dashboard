@@ -28,6 +28,13 @@
     "directories": {
       "output": "build"
     },
+    "publish": [
+      "github", 
+      {
+        "provider": "generic",
+        "url": "http://192.168.3.100/download/iot-dashboard/"
+      }
+    ],
     "files": [
       "dist/electron/**/*",
       "src/utils/Constant.js"
