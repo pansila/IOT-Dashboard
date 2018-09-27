@@ -3,6 +3,7 @@
 import { app, BrowserWindow, ipcMain } from 'electron'
 import path from 'path'
 import {fork} from 'child_process'
+import * as constant from '@utils/Constant.js'
 
 /**
  * Set `__static` path to static files in production
@@ -54,16 +55,16 @@ app.on('activate', () => {
 })
 
 let children = []
-function runScript (caller, script) {
+function runScript (caller, scriptName) {
   const child = fork(path.join(__static, 'test-runner.js'), {stdio: [0, 1, 2, 'ipc']})
   child.on('message', function (m) {
     caller.send('asynchronous-reply', m)
   })
   child.on('disconnect', function (m) {
-    caller.send('asynchronous-reply', {type: 'listen-cleanup', data: null})
-    stopScript(caller, script, false)
+    caller.send('asynchronous-reply', {event: constant.EVENT_LISTEN_CLEANUP, data: null})
+    stopScript(caller, scriptName, false)
   })
-  child.send({type: 'script', value: script})
+  child.send({event: constant.EVENT_RUN_SCRIPT, data: scriptName})
 
   return child
 }
@@ -83,39 +84,39 @@ function stopScript (caller, scriptName, kill) {
 }
 
 function send2Script (caller, scriptName, data) {
-  let found
+  let found = -1
   children.forEach((c, i) => {
     if (c.name === scriptName) {
       found = i
     }
   })
-  if (found !== undefined) {
-    children[found].child.send({type: 'listen-keyword-result', value: data})
+  if (found !== -1) {
+    children[found].child.send({event: constant.EVENT_LISTEN_KEYWORD_RESULT, data: data})
+  } else {
+    console.error('can\'t find the script to send')
   }
 }
 
-ipcMain.on('asynchronous-message', (event, arg) => {
-  if (arg.script) {
-    let {command, value} = arg.script
-    switch (command) {
-      case 'run':
-        let child = runScript(event.sender, value)
-        children.push({name: value, child: child})
-        break
-      case 'stop':
-        if (stopScript(event.sender, value, true) < 0) {
-          console.error('The script is not running')
-        } else {
-          event.sender.send('asynchronous-reply', {type: 'log', data: '<= stop the script "' + value.slice(0, -3) + '"'})
-          event.sender.send('asynchronous-reply', {type: 'listen-cleanup', data: null})
-        }
-        break
-      case 'listen-keyword-result':
-        send2Script(event.sender, 'test.js', arg.script.data)
-        break
-      default:
-        console.log('unknown script command')
-    }
+ipcMain.on('asynchronous-message', (ev, arg) => {
+  let {event, data} = arg
+  switch (event) {
+    case constant.EVENT_RUN_SCRIPT:
+      let child = runScript(ev.sender, data)
+      children.push({name: data, child: child})
+      break
+    case constant.EVENT_STOP_SCRIPT:
+      if (stopScript(ev.sender, data, true) < 0) {
+        ev.sender.send('asynchronous-reply', {event: constant.EVENT_PRINT_LOG, data: '!= the script is not running'})
+      } else {
+        ev.sender.send('asynchronous-reply', {event: constant.EVENT_PRINT_LOG, data: '<= stop the script "' + data.slice(0, -3) + '"'})
+        ev.sender.send('asynchronous-reply', {event: constant.EVENT_LISTEN_CLEANUP, data: null})
+      }
+      break
+    case constant.EVENT_LISTEN_KEYWORD_RESULT:
+      send2Script(ev.sender, 'test.js', data)
+      break
+    default:
+      console.error(`unknown event ${event} from renderer process`)
   }
 })
 

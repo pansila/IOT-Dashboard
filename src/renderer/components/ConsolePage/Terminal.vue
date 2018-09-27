@@ -17,6 +17,7 @@ import {LineBreaker, LineParser, TimestampPrefix, KeywordFilter} from '@utils/Co
 import {PassThrough} from 'stream'
 import fs from 'fs'
 import path from 'path'
+import * as constant from '@utils/Constant'
 
 Terminal.applyAddon(fit)
 // Terminal.applyAddon(attach)
@@ -193,6 +194,46 @@ export default {
           .catch(reject)
       })
     },
+    setup (port) {
+      this.serialport = port
+      this.setupTerminal()
+
+      // const lineParser = new SerialPort.parsers.Readline({ delimiter: '\r\n' })
+      const lineBreaker = LineBreaker(this.terminal.implicitCarriageEnabled, this.terminal.implicitLineFeedEnabled)
+      const lineParser = LineParser()
+      const highlighter = this.terminal.highlightEnabled ? Highlighter(this.highlightConfig) : new PassThrough()
+      const timestampPrefix = this.terminal.timestampEnabled ? TimestampPrefix() : new PassThrough()
+      const keywordFilter = new KeywordFilter()
+
+      port.on('close', e => { this.serialport = null; console.log('Close', e) })
+      port.on('error', alert)
+      port
+        .pipe(lineBreaker)
+        .pipe(timestampPrefix)
+        .pipe(lineParser)
+        .pipe(keywordFilter.piper)
+        .pipe(highlighter)
+        .on('data', data => {
+          // console.log(Array.from(data).map(ch => ch.charCodeAt()))
+          this.term.write(data)
+        })
+
+      this.eventHub.$on(constant.EVENT_TERMINAL_OUTPUT, e => {
+        // this.term.writeln(e)
+        this.serialport.write(e + '\r')
+      })
+      this.eventHub.$on(constant.EVENT_LISTEN_KEYWORD, e => {
+        keywordFilter.keywordInstall(e)
+        keywordFilter.listen().then(x => {
+          this.eventHub.$emit(constant.EVENT_LISTEN_KEYWORD_RESULT, x)
+        }).catch(x => {
+          this.eventHub.$emit(constant.EVENT_LISTEN_KEYWORD_RESULT, null)
+        })
+      })
+      this.eventHub.$on(constant.EVENT_LISTEN_CLEANUP, e => {
+        keywordFilter.keywordUninstall()
+      })
+    },
     onResize (size) {
       if (this.term) {
         this.term.fit()
@@ -200,51 +241,12 @@ export default {
       }
 
       this.setupSerialport()
-        .then(port => {
-          this.serialport = port
-          this.setupTerminal()
-
-          // const lineParser = new SerialPort.parsers.Readline({ delimiter: '\r\n' })
-          const lineBreaker = LineBreaker(this.terminal.implicitCarriageEnabled, this.terminal.implicitLineFeedEnabled)
-          const lineParser = LineParser()
-          const highlighter = this.terminal.highlightEnabled ? Highlighter(this.highlightConfig) : new PassThrough()
-          const timestampPrefix = this.terminal.timestampEnabled ? TimestampPrefix() : new PassThrough()
-          const keywordFilter = new KeywordFilter()
-
-          port.on('close', e => { this.serialport = null; console.log('Close', e) })
-          port.on('error', alert)
-          port
-            .pipe(lineBreaker)
-            .pipe(timestampPrefix)
-            .pipe(lineParser)
-            .pipe(keywordFilter.piper)
-            .pipe(highlighter)
-            .on('data', data => {
-              // console.log(Array.from(data).map(ch => ch.charCodeAt()))
-              this.term.write(data)
-            })
-
-          this.eventHub.$on('SCRIPT_OUTPUT', e => {
-            // this.term.writeln(e)
-            this.serialport.write(e + '\r')
-          })
-          this.eventHub.$on('LISTEN_KEYWORD', e => {
-            keywordFilter.keywordInstall(e)
-            keywordFilter.listen().then(x => {
-              this.eventHub.$emit('LISTEN_KEYWORD_RESULT', x)
-            }).catch(x => {
-              this.eventHub.$emit('LISTEN_KEYWORD_RESULT', null)
-            })
-          })
-          this.eventHub.$on('LISTEN_CLEANUP', e => {
-            keywordFilter.keywordUninstall()
-          })
-        })
+        .then(this.setup)
         .catch(console.log)
     }
   },
   mounted () {
-    let content = fs.readFileSync(path.join(__static, '/highlight.json'))
+    let content = fs.readFileSync(path.join(__static, 'highlight.json'))
     this.highlightConfig = JSON.parse(content)
   },
   beforeDestroy () {

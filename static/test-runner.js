@@ -1,4 +1,4 @@
-const path = require('path')
+// const path = require('path')
 
 require('babel-register')({
   'presets': [
@@ -9,14 +9,19 @@ require('babel-register')({
   ]
 })
 
+let constant
+try {
+  constant = require('../../../../app.asar/src/utils/Constant')
+} catch (err) {
+  constant = require('../src/utils/Constant')
+}
 let {print2log, scriptInit} = require('./test-helper')
 
 process.on('message', function (m) {
-  let {type, value} = m
-  if (type === 'script') {
-    print2log('\n=> start the script "' + value.slice(0, -3) + '"')
-    scriptInit(value)
-    // require(path.join(__dirname, 'scripts', value))
-    require('./scripts/' + value)
+  let {event, data} = m
+  if (event === constant.EVENT_RUN_SCRIPT) {
+    print2log('\n=> start the script "' + data.slice(0, -3) + '"')
+    scriptInit(data)
+    require('./scripts/' + data)
   }
 })

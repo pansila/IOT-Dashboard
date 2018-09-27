@@ -74,6 +74,7 @@
   import fs from 'fs'
   import path from 'path'
   import Vue from 'vue'
+  import * as constant from '@utils/Constant'
 
   export default {
     name: 'consolePage',
@@ -94,7 +95,7 @@
       })
     },
     mounted () {
-      let scriptPath = path.join(__static, '/scripts')
+      let scriptPath = path.join(__static, 'scripts')
       fs.readdir(scriptPath, (err, files) => {
         if (err) {
           alert(err)
@@ -115,34 +116,29 @@
       })
 
       ipcRenderer.on('asynchronous-reply', (event, value) => {
-        if (value.type) {
-          let {type, data} = value
-          switch (type) {
-            case 'terminal':
-              this.terminalEventHub.$emit('SCRIPT_OUTPUT', data)
+        if (value.event) {
+          let {event, data} = value
+          switch (event) {
+            case constant.EVENT_PRINT_TERMINAL:
+              this.terminalEventHub.$emit(constant.EVENT_TERMINAL_OUTPUT, data)
               break
-            case 'log':
-              this.scriptEventHub.$emit('SCRIPT_OUTPUT', data)
+            case constant.EVENT_PRINT_LOG:
+              this.scriptEventHub.$emit(constant.EVENT_TERMINAL_OUTPUT, data)
               break
-            case 'listen-keyword':
-              this.terminalEventHub.$emit('LISTEN_KEYWORD', data)
-              break
-            case 'listen-cleanup':
-              this.terminalEventHub.$emit('LISTEN_CLEANUP', data)
+            case constant.EVENT_LISTEN_KEYWORD:
+            case constant.EVENT_LISTEN_CLEANUP:
+              this.terminalEventHub.$emit(event, data)
               break
           }
         }
       })
 
-      this.scriptEventHub.$on('SCRIPT_INPUT', console.log)
-      this.terminalEventHub.$on('SCRIPT_INPUT', console.log)
-      this.terminalEventHub.$on('LISTEN_KEYWORD_RESULT', d => {
+      this.scriptEventHub.$on(constant.EVENT_TERMINAL_INPUT, console.log)
+      this.terminalEventHub.$on(constant.EVENT_TERMINAL_INPUT, console.log)
+      this.terminalEventHub.$on(constant.EVENT_LISTEN_KEYWORD_RESULT, d => {
         ipcRenderer.send('asynchronous-message', {
-          script: {
-            command: 'listen-keyword-result',
-            value: d,
-            data: d
-          }
+          event: constant.EVENT_LISTEN_KEYWORD_RESULT,
+          data: d
         })
       })
     },
@@ -163,19 +159,15 @@
       onRunScript (e) {
         if (!this.scriptSelected) return
         ipcRenderer.send('asynchronous-message', {
-          script: {
-            command: 'run',
-            value: this.scriptSelected + '.js'
-          }
+          event: constant.EVENT_RUN_SCRIPT,
+          data: this.scriptSelected + '.js'
         })
       },
       onStopScript (e) {
         if (!this.scriptSelected) return
         ipcRenderer.send('asynchronous-message', {
-          script: {
-            command: 'stop',
-            value: this.scriptSelected + '.js'
-          }
+          event: constant.EVENT_STOP_SCRIPT,
+          data: this.scriptSelected + '.js'
         })
       },
       onEditScript (e) {

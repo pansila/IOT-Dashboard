@@ -10,6 +10,7 @@
   import 'xterm/dist/xterm.css'
   import resizesensor from '@components/ResizeSensor'
   import {execFile} from 'child_process'
+  import * as constant from '@utils/Constant'
 
   Terminal.applyAddon(fit)
 
@@ -58,7 +59,7 @@
         this.term.on('key', (data) => {
           this.term.write(data)
         })
-        this.eventHub.$on('SCRIPT_OUTPUT', e => this.term.writeln(e))
+        this.eventHub.$on(constant.EVENT_TERMINAL_OUTPUT, e => this.term.writeln(e))
       }
     },
     beforeDestroy () {

@@ -58,19 +58,27 @@ function LineBreaker (implicitCarriage, implicitLineFeed) {
 }
 
 let buffer = ''
+let timerID
 /* Assemble the words resulting of serial port output delay to make a line */
 function LineParser () {
   return through2.obj(function (line, _, next) {
     if (line.endsWith('\r\n')) {
       this.push(buffer + line)
+      if (timerID) {
+        clearTimeout(timerID)
+        timerID = null
+      }
       buffer = ''
     } else {
-      setTimeout(() => {
-        if (buffer !== '') {
-          this.push(buffer)
-          buffer = ''
-        }
-      }, 10)
+      if (buffer === '') {
+        timerID = setTimeout(() => {
+          if (buffer !== '') {
+            this.push(buffer)
+            buffer = ''
+            timerID = null
+          }
+        }, 10)
+      }
       buffer += line
     }
     next()
@@ -82,9 +90,11 @@ class KeywordFilter {
     this.keywords = []
     let _this = this
     this.piper = through2.obj(function (line, _, next) {
-      _this.keywords.forEach(kw => {
+      let keywords = _this.keywords
+      keywords.forEach(kw => {
         if (kw.test(line)) {
           _this.listenPromise(line)
+          _this.keywords = []
         }
       })
       this.push(line)

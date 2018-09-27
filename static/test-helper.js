@@ -1,3 +1,10 @@
+let constant
+try {
+  constant = require('../../../../app.asar/src/utils/Constant')
+} catch (err) {
+  constant = require('../src/utils/Constant')
+}
+
 let script
 
 function exit () {
@@ -7,11 +14,11 @@ function exit () {
 }
 
 function print2log (data) {
-  process.send({type: 'log', data: data})
+  process.send({event: constant.EVENT_PRINT_LOG, data: data})
 }
 
 function print2term (data) {
-  process.send({type: 'terminal', data: data})
+  process.send({event: constant.EVENT_PRINT_TERMINAL, data: data})
 }
 
 function sleep (ms) {
@@ -22,16 +29,16 @@ function sleep (ms) {
   })
 }
 
-function listen (keyword, timeout = 0) {
+function listen (keyword, timeout = -1) {
   return new Promise(function (resolve, reject) {
-    process.send({type: 'listen-keyword', data: keyword})
+    process.send({event: constant.EVENT_LISTEN_KEYWORD, data: keyword})
     process.on('message', function (m) {
-      let {type, value} = m
-      if (type === 'listen-keyword-result') {
-        resolve(value)
+      let {event, data} = m
+      if (event === constant.EVENT_LISTEN_KEYWORD_RESULT) {
+        resolve(data)
       }
     })
-    setTimeout(() => reject(new Error('timeout')), timeout)
+    if (timeout >= 0) setTimeout(() => reject(new Error('timeout')), timeout)
   })
 }
 
