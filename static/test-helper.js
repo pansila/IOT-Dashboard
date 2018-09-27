@@ -22,7 +22,7 @@ function sleep (ms) {
   })
 }
 
-function listen (keyword, timeout) {
+function listen (keyword, timeout = 0) {
   return new Promise(function (resolve, reject) {
     process.send({type: 'listen-keyword', data: keyword})
     process.on('message', function (m) {

@@ -236,6 +236,9 @@ export default {
               this.eventHub.$emit('LISTEN_KEYWORD_RESULT', null)
             })
           })
+          this.eventHub.$on('LISTEN_CLEANUP', e => {
+            keywordFilter.keywordUninstall()
+          })
         })
         .catch(console.log)
     }

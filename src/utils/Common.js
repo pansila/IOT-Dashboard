@@ -104,7 +104,7 @@ class KeywordFilter {
   }
 
   keywordUninstall (keyword) {
-  // this.keywords.push(regexp)
+    this.keywords = []
   }
 }
 

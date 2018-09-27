@@ -60,6 +60,7 @@ function runScript (caller, script) {
     caller.send('asynchronous-reply', m)
   })
   child.on('disconnect', function (m) {
+    caller.send('asynchronous-reply', {type: 'listen-cleanup', data: null})
     stopScript(caller, script, false)
   })
   child.send({type: 'script', value: script})
@@ -68,16 +69,17 @@ function runScript (caller, script) {
 }
 
 function stopScript (caller, scriptName, kill) {
-  let found
+  let found = -1
   children.forEach((c, i) => {
     if (c.name === scriptName) {
       found = i
     }
   })
-  if (found !== undefined) {
+  if (found !== -1) {
     if (kill) process.kill(children[found].child.pid, 'SIGINT')
     children.splice(found, 1)
   }
+  return found
 }
 
 function send2Script (caller, scriptName, data) {
@@ -101,8 +103,12 @@ ipcMain.on('asynchronous-message', (event, arg) => {
         children.push({name: value, child: child})
         break
       case 'stop':
-        event.sender.send('asynchronous-reply', {type: 'log', data: '<= stop the script "' + value.slice(0, -3) + '"'})
-        stopScript(event.sender, value, true)
+        if (stopScript(event.sender, value, true) < 0) {
+          console.error('The script is not running')
+        } else {
+          event.sender.send('asynchronous-reply', {type: 'log', data: '<= stop the script "' + value.slice(0, -3) + '"'})
+          event.sender.send('asynchronous-reply', {type: 'listen-cleanup', data: null})
+        }
         break
       case 'listen-keyword-result':
         send2Script(event.sender, 'test.js', arg.script.data)

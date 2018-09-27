@@ -127,6 +127,9 @@
             case 'listen-keyword':
               this.terminalEventHub.$emit('LISTEN_KEYWORD', data)
               break
+            case 'listen-cleanup':
+              this.terminalEventHub.$emit('LISTEN_CLEANUP', data)
+              break
           }
         }
       })
