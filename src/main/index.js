@@ -5,6 +5,9 @@ import path from 'path'
 import {fork} from 'child_process'
 import * as constant from '@utils/Constant.js'
 import { autoUpdater } from 'electron-updater'
+import log from 'electron-log'
+
+log.transports.file.level = 'debug'
 
 /**
  * Set `__static` path to static files in production
@@ -59,10 +62,10 @@ let children = []
 function runScript (caller, scriptName) {
   const child = fork(path.join(__static, 'test-runner.js'), {stdio: [0, 1, 2, 'ipc']})
   child.on('message', function (m) {
-    caller.send('asynchronous-reply', m)
+    caller.send(constant.EVENT_ASYNC_REPLY, m)
   })
   child.on('disconnect', function (m) {
-    caller.send('asynchronous-reply', {event: constant.EVENT_LISTEN_CLEANUP, data: null})
+    caller.send(constant.EVENT_ASYNC_REPLY, {event: constant.EVENT_LISTEN_CLEANUP, data: null})
     stopScript(caller, scriptName, false)
   })
   child.send({event: constant.EVENT_RUN_SCRIPT, data: scriptName})
@@ -94,11 +97,11 @@ function send2Script (caller, scriptName, data) {
   if (found !== -1) {
     children[found].child.send({event: constant.EVENT_LISTEN_KEYWORD_RESULT, data: data})
   } else {
-    console.error('can\'t find the script to send')
+    log.error('can\'t find the script to send')
   }
 }
 
-ipcMain.on('asynchronous-message', (ev, arg) => {
+ipcMain.on(constant.EVENT_ASYNC_MSG, (ev, arg) => {
   let {event, data} = arg
   switch (event) {
     case constant.EVENT_RUN_SCRIPT:
@@ -107,17 +110,17 @@ ipcMain.on('asynchronous-message', (ev, arg) => {
       break
     case constant.EVENT_STOP_SCRIPT:
       if (stopScript(ev.sender, data, true) < 0) {
-        ev.sender.send('asynchronous-reply', {event: constant.EVENT_PRINT_LOG, data: '!= the script is not running'})
+        ev.sender.send(constant.EVENT_ASYNC_REPLY, {event: constant.EVENT_PRINT_LOG, data: '!= the script is not running'})
       } else {
-        ev.sender.send('asynchronous-reply', {event: constant.EVENT_PRINT_LOG, data: '<= stop the script "' + data.slice(0, -3) + '"'})
-        ev.sender.send('asynchronous-reply', {event: constant.EVENT_LISTEN_CLEANUP, data: null})
+        ev.sender.send(constant.EVENT_ASYNC_REPLY, {event: constant.EVENT_PRINT_LOG, data: '<= stop the script "' + data.slice(0, -3) + '"'})
+        ev.sender.send(constant.EVENT_ASYNC_REPLY, {event: constant.EVENT_LISTEN_CLEANUP, data: null})
       }
       break
     case constant.EVENT_LISTEN_KEYWORD_RESULT:
       send2Script(ev.sender, 'test.js', data)
       break
     default:
-      console.error(`unknown event ${event} from renderer process`)
+      log.error(`unknown event ${event} from renderer process`)
   }
 })
 
@@ -126,5 +129,25 @@ autoUpdater.on('update-downloaded', () => {
 })
 
 app.on('ready', () => {
-  if (process.env.NODE_ENV === 'production') autoUpdater.checkForUpdates()
+  if (process.env.NODE_ENV === 'production') {
+    autoUpdater.logger = log
+    autoUpdater.checkForUpdatesAndNotify()
+    autoUpdater.on('update-downloaded', (event, releaseNotes, releaseName, releaseDate, updateUrl, quitAndUpdate) => {
+      ipcMain.on(constant.EVENT_IS_UPDATE_NOW, (e, arg) => {
+        log.info('start to update')
+        autoUpdater.quitAndInstall()
+      })
+
+      mainWindow.webContents.send(constant.EVENT_IS_UPDATE_NOW)
+    })
+
+    ipcMain.on(constant.EVENT_CHECK_FOR_UPDATE, () => {
+      autoUpdater.checkForUpdates()
+    })
+
+    setInterval(() => {
+      autoUpdater.checkForUpdatesAndNotify()
+    }, 30000)
+    // }, 3600000)
+  }
 })

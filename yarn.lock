@@ -3196,6 +3196,10 @@ electron-localshortcut@^3.0.0:
     keyboardevent-from-electron-accelerator "^1.1.0"
     keyboardevents-areequal "^0.2.1"
 
+electron-log@^2.2.17:
+  version "2.2.17"
+  resolved "http://r.cnpmjs.org/electron-log/download/electron-log-2.2.17.tgz#e71e2ebb949fc96ded7cdb99eeee7202e48981d2"
+
 electron-osx-sign@0.4.8:
   version "0.4.8"
   resolved "http://r.cnpmjs.org/electron-osx-sign/download/electron-osx-sign-0.4.8.tgz#f0b9fadded9e1e54ec35fa89877b5c6c34c7bc40"

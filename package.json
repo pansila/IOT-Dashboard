@@ -1,6 +1,6 @@
 {
   "name": "IOT-Dashboard",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "author": "Pansila <panzilla@163.com>",
   "description": "A debug tool helping with WiFi IOT development",
   "license": "MIT",
@@ -74,6 +74,7 @@
     "babel-preset-stage-3": "^6.24.1",
     "babel-register": "^6.24.1",
     "bootstrap-vue": "^2.0.0-rc.11",
+    "electron-log": "^2.2.17",
     "electron-updater": "^3.1.2",
     "serialport": "^6.2.2",
     "through2": "^2.0.3",

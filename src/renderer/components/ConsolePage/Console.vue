@@ -115,7 +115,7 @@
         })
       })
 
-      ipcRenderer.on('asynchronous-reply', (event, value) => {
+      ipcRenderer.on(constant.EVENT_ASYNC_REPLY, (event, value) => {
         if (value.event) {
           let {event, data} = value
           switch (event) {
@@ -133,10 +133,15 @@
         }
       })
 
+      ipcRenderer.on(constant.EVENT_IS_UPDATE_NOW, (event, value) => {
+        alert('有更新版本，是否现在升级？')
+        ipcRenderer.send(constant.EVENT_IS_UPDATE_NOW, true)
+      })
+
       this.scriptEventHub.$on(constant.EVENT_TERMINAL_INPUT, console.log)
       this.terminalEventHub.$on(constant.EVENT_TERMINAL_INPUT, console.log)
       this.terminalEventHub.$on(constant.EVENT_LISTEN_KEYWORD_RESULT, d => {
-        ipcRenderer.send('asynchronous-message', {
+        ipcRenderer.send(constant.EVENT_ASYNC_MSG, {
           event: constant.EVENT_LISTEN_KEYWORD_RESULT,
           data: d
         })
@@ -158,14 +163,14 @@
       },
       onRunScript (e) {
         if (!this.scriptSelected) return
-        ipcRenderer.send('asynchronous-message', {
+        ipcRenderer.send(constant.EVENT_ASYNC_MSG, {
           event: constant.EVENT_RUN_SCRIPT,
           data: this.scriptSelected + '.js'
         })
       },
       onStopScript (e) {
         if (!this.scriptSelected) return
-        ipcRenderer.send('asynchronous-message', {
+        ipcRenderer.send(constant.EVENT_ASYNC_MSG, {
           event: constant.EVENT_STOP_SCRIPT,
           data: this.scriptSelected + '.js'
         })
