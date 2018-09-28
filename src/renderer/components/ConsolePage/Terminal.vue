@@ -246,7 +246,7 @@ export default {
     }
   },
   mounted () {
-    let content = fs.readFileSync(path.join(__static, 'highlight.json'))
+    let content = fs.readFileSync(path.join(__static, 'config', 'highlight.json'))
     this.highlightConfig = JSON.parse(content)
   },
   beforeDestroy () {
