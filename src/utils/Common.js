@@ -98,7 +98,6 @@ class LineParser extends Stream.Transform {
         }
         if (this.prompt && line.length < 5) {
           this.push(line)
-          this.prompt = false
         } else {
           this.timerID = setTimeout(() => {
             if (this.buffer !== '') {
@@ -109,6 +108,7 @@ class LineParser extends Stream.Transform {
           }, 10)
           this.buffer = line
         }
+        this.prompt = false
       } else {
         this.buffer += line
       }
@@ -122,8 +122,10 @@ class LineParser extends Stream.Transform {
 }
 
 class KeywordFilter extends Stream.Transform {
+  buffer = ''
   keywords = []
   futureResolve = undefined
+  timerID = undefined
 
   constructor (options) {
     super({
@@ -132,7 +134,7 @@ class KeywordFilter extends Stream.Transform {
     })
   }
 
-  _transform (line, enc, next) {
+  findKeyword (line) {
     let keywords = this.keywords
     keywords.forEach(kw => {
       if (kw.test(line)) {
@@ -140,6 +142,28 @@ class KeywordFilter extends Stream.Transform {
         this.keywords = []
       }
     })
+  }
+
+  _transform (line, enc, next) {
+    if (line.endsWith('\r\n')) {
+      this.findKeyword(this.buffer + line)
+      if (this.timerID) {
+        clearTimeout(this.timerID)
+        this.timerID = null
+      }
+      this.buffer = ''
+    } else {
+      if (this.buffer === '') {
+        this.timerID = setTimeout(() => {
+          if (this.buffer !== '') {
+            this.findKeyword(this.buffer)
+            this.buffer = ''
+            this.timerID = null
+          }
+        }, 100)
+      }
+      this.buffer += line
+    }
     this.push(line)
     next()
   }
