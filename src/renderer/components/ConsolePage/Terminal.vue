@@ -69,7 +69,13 @@ export default {
       input: '',
       lookupHistory: false,
       // promptOffset: 0,
-      highlightConfig: null
+      highlightConfig: null,
+      /* pipes */
+      lineBreaker: null,
+      lineParser: null,
+      highlighter: null,
+      timestampPrefix: null,
+      keywordFilter: null
     }
   },
   methods: {
@@ -153,6 +159,7 @@ export default {
             // this.term.write('\r')
           }
           this.input = ''
+          this.lineParser.expectPrompt()
         } else if (ev.keyCode === 8) {
           if (this.input.length > 0) {
             this.term.write('\b \b')
@@ -198,21 +205,20 @@ export default {
       this.serialport = port
       this.setupTerminal()
 
-      // const lineParser = new SerialPort.parsers.Readline({ delimiter: '\r\n' })
-      const lineBreaker = LineBreaker(this.terminal.implicitCarriageEnabled, this.terminal.implicitLineFeedEnabled)
-      const lineParser = LineParser()
-      const highlighter = this.terminal.highlightEnabled ? Highlighter(this.highlightConfig) : new PassThrough()
-      const timestampPrefix = this.terminal.timestampEnabled ? TimestampPrefix() : new PassThrough()
-      const keywordFilter = new KeywordFilter()
+      this.lineBreaker = LineBreaker(this.terminal.implicitCarriageEnabled, this.terminal.implicitLineFeedEnabled)
+      this.lineParser = new LineParser()
+      this.highlighter = this.terminal.highlightEnabled ? Highlighter(this.highlightConfig) : new PassThrough()
+      this.timestampPrefix = this.terminal.timestampEnabled ? new TimestampPrefix() : new PassThrough()
+      this.keywordFilter = new KeywordFilter()
 
       port.on('close', e => { this.serialport = null; console.log('Close', e) })
       port.on('error', alert)
       port
-        .pipe(lineBreaker)
-        .pipe(timestampPrefix)
-        .pipe(lineParser)
-        .pipe(keywordFilter.piper)
-        .pipe(highlighter)
+        .pipe(this.lineBreaker)
+        .pipe(this.timestampPrefix)
+        .pipe(this.lineParser)
+        .pipe(this.keywordFilter)
+        .pipe(this.highlighter)
         .on('data', data => {
           // console.log(Array.from(data).map(ch => ch.charCodeAt()))
           this.term.write(data)
@@ -223,15 +229,15 @@ export default {
         this.serialport.write(e + '\r')
       })
       this.eventHub.$on(constant.EVENT_LISTEN_KEYWORD, e => {
-        keywordFilter.keywordInstall(e)
-        keywordFilter.listen().then(x => {
+        this.keywordFilter.keywordInstall(e)
+        this.keywordFilter.listen().then(x => {
           this.eventHub.$emit(constant.EVENT_LISTEN_KEYWORD_RESULT, x)
         }).catch(x => {
           this.eventHub.$emit(constant.EVENT_LISTEN_KEYWORD_RESULT, null)
         })
       })
       this.eventHub.$on(constant.EVENT_LISTEN_CLEANUP, e => {
-        keywordFilter.keywordUninstall()
+        this.keywordFilter.keywordUninstall()
       })
     },
     onResize (size) {

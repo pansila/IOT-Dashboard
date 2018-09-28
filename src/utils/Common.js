@@ -1,5 +1,6 @@
 import through2 from 'through2'
 import ansi from 'ansi-styles'
+import { Stream } from 'stream'
 
 function PadMilliseconds (v) {
   if (v < 10) {
@@ -11,22 +12,27 @@ function PadMilliseconds (v) {
   return v
 }
 
-let newline = false
-function TimestampPrefix () {
-  return through2.obj(function (line, _, next) {
-    // console.log(line, newline)
-    // console.log(Buffer.from(line))
-    if (newline) {
+class TimestampPrefix extends Stream.Transform {
+  newline = false
+
+  constructor (options) {
+    super({
+      readableObjectMode: true,
+      writableObjectMode: true
+    })
+  }
+
+  _transform (line, enc, next) {
+    if (this.newline) {
       let d = new Date()
       let timestamp = d.toTimeString().slice(0, 8) + '.' + PadMilliseconds(d.getMilliseconds()) + ': '
       timestamp = ansi.bold.open + ansi.grey.open + timestamp + ansi.grey.close + ansi.bold.close
-      this.push(timestamp + line)
-    } else {
-      this.push(line)
+      this.push(timestamp)
     }
-    newline = line.endsWith('\r\n')
+    this.push(line)
+    this.newline = line.endsWith('\r\n')
     next()
-  }, done => done())
+  }
 }
 
 function LineBreaker (implicitCarriage, implicitLineFeed) {
@@ -57,59 +63,90 @@ function LineBreaker (implicitCarriage, implicitLineFeed) {
   }, done => done())
 }
 
-let buffer = ''
-let timerID
 /* join the split words resulting of serial port output delay to form a line */
-function LineParser () {
-  return through2.obj(function (line, _, next) {
+class LineParser extends Stream.Transform {
+  buffer = ''
+  timerID = undefined
+  prompt = false
+
+  constructor (options) {
+    super({
+      readableObjectMode: true,
+      writableObjectMode: true
+    })
+  }
+
+  _transform (line, enc, next) {
+    // console.log(Buffer.from(line))
     if (line.endsWith('\r\n')) {
-      this.push(buffer + line)
-      if (timerID) {
-        clearTimeout(timerID)
-        timerID = null
+      this.push(this.buffer + line)
+      if (this.timerID) {
+        clearTimeout(this.timerID)
+        this.timerID = null
       }
-      buffer = ''
+      this.buffer = ''
     } else {
-      if (buffer === '') {
-        /* workaround to flush prompt characters immediately to avoid prompt lag */
-        if (line.length < 5 || line.startsWith('\x1b\x5b')) {
+      if (this.buffer === '') {
+        /* workaround to flush prompt characters immediately to avoid prompt lag,
+         * it makes LineParser dependent on the output structure of TimestampPrefix
+         * TODO: a better way to decouple
+         */
+        if (line.startsWith('\x1b\x5b')) {
           this.push(line)
+          next()
+          return
+        }
+        if (this.prompt && line.length < 5) {
+          this.push(line)
+          this.prompt = false
         } else {
-          timerID = setTimeout(() => {
-            if (buffer !== '') {
-              this.push(buffer)
-              buffer = ''
-              timerID = null
+          this.timerID = setTimeout(() => {
+            if (this.buffer !== '') {
+              this.push(this.buffer)
+              this.buffer = ''
+              this.timerID = null
             }
           }, 10)
-          buffer += line
+          this.buffer = line
         }
+      } else {
+        this.buffer += line
       }
     }
     next()
-  }, done => done())
+  }
+
+  expectPrompt () {
+    this.prompt = true
+  }
 }
 
-class KeywordFilter {
-  constructor () {
-    this.keywords = []
-    let _this = this
-    this.piper = through2.obj(function (line, _, next) {
-      let keywords = _this.keywords
-      keywords.forEach(kw => {
-        if (kw.test(line)) {
-          _this.listenPromise(line)
-          _this.keywords = []
-        }
-      })
-      this.push(line)
-      next()
-    }, done => done())
+class KeywordFilter extends Stream.Transform {
+  keywords = []
+  futureResolve = undefined
+
+  constructor (options) {
+    super({
+      readableObjectMode: true,
+      writableObjectMode: true
+    })
+  }
+
+  _transform (line, enc, next) {
+    let keywords = this.keywords
+    keywords.forEach(kw => {
+      if (kw.test(line)) {
+        this.futureResolve(line)
+        this.keywords = []
+      }
+    })
+    this.push(line)
+    next()
   }
 
   listen () {
     return new Promise((resolve, reject) => {
-      this.listenPromise = resolve
+      this.futureResolve = resolve
     })
   }
 
