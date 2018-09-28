@@ -77,7 +77,6 @@ class LineParser extends Stream.Transform {
   }
 
   _transform (line, enc, next) {
-    // console.log(Buffer.from(line))
     if (line.endsWith('\r\n')) {
       this.push(this.buffer + line)
       if (this.timerID) {
@@ -174,12 +173,13 @@ class KeywordFilter extends Stream.Transform {
     })
   }
 
-  keywordInstall (keyword) {
-    let regexp = new RegExp(keyword)
-    this.keywords.push(regexp)
+  keywordInstall (...keywords) {
+    keywords.forEach((kw) => {
+      this.keywords.push(new RegExp(kw))
+    })
   }
 
-  keywordUninstall (keyword) {
+  keywordUninstall () {
     this.keywords = []
   }
 }

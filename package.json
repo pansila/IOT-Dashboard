@@ -29,11 +29,11 @@
       "output": "build"
     },
     "publish": [
-      "github", 
       {
         "provider": "generic",
-        "url": "http://192.168.3.100/download/iot-dashboard/"
-      }
+        "url": "http://127.0.0.1:8000/"
+      },
+      "github"
     ],
     "files": [
       "dist/electron/**/*",

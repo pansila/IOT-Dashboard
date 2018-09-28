@@ -1,3 +1,5 @@
+import {exec} from 'child_process'
+
 let constant
 try {
   constant = require('../../../../app.asar/src/utils/Constant')
@@ -17,8 +19,22 @@ function print2log (data) {
   process.send({event: constant.EVENT_PRINT_LOG, data: data})
 }
 
-function print2term (data) {
-  process.send({event: constant.EVENT_PRINT_TERMINAL, data: data})
+function command2term (command) {
+  process.send({event: constant.EVENT_PRINT_TERMINAL, data: command})
+}
+
+function command2local (command, codePage = '65001') {
+  return new Promise((resolve, reject) => {
+    command = `@chcp ${codePage} > nul && ` + command
+    // const env = Object.assign({chcp: '65001'}, process.env)
+    exec(command,
+      // {env: env},
+      (err, stdout, stderr) => {
+        if (err) reject(err)
+        resolve(stdout)
+      }
+    )
+  })
 }
 
 function sleep (ms) {
@@ -46,4 +62,4 @@ function scriptInit (data) {
   script = data
 }
 
-export {exit, print2term, print2log, scriptInit, sleep, listen}
+export {exit, command2term, command2local, print2log, scriptInit, sleep, listen}
