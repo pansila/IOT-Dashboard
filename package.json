@@ -23,7 +23,7 @@
     "postinstall": "npm run lint:fix && npm run rebuild"
   },
   "build": {
-    "productName": "IOT Dashboard",
+    "productName": "IOT-Dashboard",
     "appId": "io.github.pansila",
     "directories": {
       "output": "build"
@@ -35,6 +35,9 @@
       },
       "github"
     ],
+    "nsis": {
+      "artifactName": "${productName}-${version}.${ext}"
+    },
     "files": [
       "dist/electron/**/*",
       "src/utils/Constant.js"
