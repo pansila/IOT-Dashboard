@@ -55,6 +55,7 @@ let mainConfig = {
     extensions: ['.js', '.json', '.node'],
     alias: {
       '@utils': path.join(__dirname, '../src/utils'),
+      '@config': path.join(__dirname, '../static/config')
     }
   },
   target: 'electron-main'

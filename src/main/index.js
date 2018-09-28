@@ -6,6 +6,7 @@ import {fork} from 'child_process'
 import * as constant from '@utils/Constant.js'
 import { autoUpdater } from 'electron-updater'
 import log from 'electron-log'
+import config from '@config/config.json'
 
 log.transports.file.level = 'debug'
 
@@ -131,15 +132,22 @@ autoUpdater.on('update-downloaded', () => {
 app.on('ready', () => {
   if (process.env.NODE_ENV === 'production') {
     autoUpdater.logger = log
-    autoUpdater.checkForUpdatesAndNotify()
-    autoUpdater.on('update-downloaded', (event, releaseNotes, releaseName, releaseDate, updateUrl, quitAndUpdate) => {
-      ipcMain.on(constant.EVENT_IS_UPDATE_NOW, (e, arg) => {
-        log.info('start to update')
-        autoUpdater.quitAndInstall()
-      })
+    if (config.updateServer) {
+      try {
+        autoUpdater.setFeedURL(config.updateServer)
+      } catch (err) {
+        log.error(err)
+      }
+    }
+    autoUpdater.checkForUpdates()
+    // autoUpdater.on('update-downloaded', (event, info) => {
+    //   ipcMain.on(constant.EVENT_IS_UPDATE_NOW, (e, arg) => {
+    //     log.info('start to update')
+    //     autoUpdater.quitAndInstall()
+    //   })
 
-      mainWindow.webContents.send(constant.EVENT_IS_UPDATE_NOW)
-    })
+    //   mainWindow.webContents.send(constant.EVENT_IS_UPDATE_NOW)
+    // })
 
     ipcMain.on(constant.EVENT_CHECK_FOR_UPDATE, () => {
       autoUpdater.checkForUpdates()
