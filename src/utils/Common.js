@@ -59,7 +59,7 @@ function LineBreaker (implicitCarriage, implicitLineFeed) {
 
 let buffer = ''
 let timerID
-/* Assemble the words resulting of serial port output delay to make a line */
+/* join the split words resulting of serial port output delay to form a line */
 function LineParser () {
   return through2.obj(function (line, _, next) {
     if (line.endsWith('\r\n')) {
@@ -71,15 +71,20 @@ function LineParser () {
       buffer = ''
     } else {
       if (buffer === '') {
-        timerID = setTimeout(() => {
-          if (buffer !== '') {
-            this.push(buffer)
-            buffer = ''
-            timerID = null
-          }
-        }, 10)
+        /* workaround to flush prompt characters immediately to avoid prompt lag */
+        if (line.length < 5 || line.startsWith('\x1b\x5b')) {
+          this.push(line)
+        } else {
+          timerID = setTimeout(() => {
+            if (buffer !== '') {
+              this.push(buffer)
+              buffer = ''
+              timerID = null
+            }
+          }, 10)
+          buffer += line
+        }
       }
-      buffer += line
     }
     next()
   }, done => done())
