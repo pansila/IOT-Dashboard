@@ -133,11 +133,6 @@
         }
       })
 
-      ipcRenderer.on(constant.EVENT_IS_UPDATE_NOW, (event, value) => {
-        alert('有更新版本，是否现在升级？')
-        ipcRenderer.send(constant.EVENT_IS_UPDATE_NOW, true)
-      })
-
       this.scriptEventHub.$on(constant.EVENT_TERMINAL_INPUT, console.log)
       this.terminalEventHub.$on(constant.EVENT_TERMINAL_INPUT, console.log)
       this.terminalEventHub.$on(constant.EVENT_LISTEN_KEYWORD_RESULT, d => {

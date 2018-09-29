@@ -125,12 +125,9 @@ ipcMain.on(constant.EVENT_ASYNC_MSG, (ev, arg) => {
   }
 })
 
-autoUpdater.on('update-downloaded', () => {
-  autoUpdater.quitAndInstall()
-})
-
 app.on('ready', () => {
   if (process.env.NODE_ENV === 'production') {
+    let updateCheckTimer
     autoUpdater.logger = log
     if (config.updateServer) {
       try {
@@ -140,20 +137,38 @@ app.on('ready', () => {
       }
     }
     autoUpdater.checkForUpdates()
-    // autoUpdater.on('update-downloaded', (event, info) => {
-    //   ipcMain.on(constant.EVENT_IS_UPDATE_NOW, (e, arg) => {
-    //     log.info('start to update')
-    //     autoUpdater.quitAndInstall()
-    //   })
-
-    //   mainWindow.webContents.send(constant.EVENT_IS_UPDATE_NOW)
-    // })
+    ipcMain.on(constant.EVENT_UPDATE, (e, action) => {
+      switch (action) {
+        case constant.MSG_UPDATE_NOW:
+          autoUpdater.quitAndInstall()
+          break
+        case constant.MSG_UPDATE_ON_QUIT:
+          if (updateCheckTimer) {
+            clearInterval(updateCheckTimer)
+            updateCheckTimer = undefined
+          }
+          autoUpdater.autoInstallOnAppQuit = true
+          break
+        case constant.MSG_NO_UPDATE:
+          if (updateCheckTimer) {
+            clearInterval(updateCheckTimer)
+            updateCheckTimer = undefined
+          }
+          /* TODO: non-documented variable, may change in future */
+          autoUpdater.quitAndInstallCalled = true
+          break
+      }
+    })
+    autoUpdater.on('update-downloaded', (event, info) => {
+      log.debug(info)
+      mainWindow.webContents.send(constant.EVENT_UPDATE, info)
+    })
 
     ipcMain.on(constant.EVENT_CHECK_FOR_UPDATE, () => {
       autoUpdater.checkForUpdates()
     })
 
-    setInterval(() => {
+    updateCheckTimer = setInterval(() => {
       autoUpdater.checkForUpdatesAndNotify()
     }, 30000)
     // }, 3600000)

@@ -35,27 +35,66 @@
         </b-tab>
       </b-tabs>
     </b-card>
+    <div>
+      <b-modal ref="modalUpdate" title="升级提示" centered>
+        <p class="my-4">{{updateVersion}}</p>
+        <p class="my-4">{{updateDetails}}</p>
+        <div slot="modal-footer" class="w-100">
+          <b-btn size="sm" class="float-right ml-2" variant="primary" @click="onUpdateNow">
+            立即更新
+          </b-btn>
+          <b-btn size="sm" class="float-right ml-2" @click="onUpdateOnQuit">
+            退出时更新
+          </b-btn>
+          <b-btn size="sm" class="float-right" @click="onNoUpdate">
+            不更新
+          </b-btn>
+       </div>
+      </b-modal>
+  </div>
   </div>
 </template>
 
 <script>
+  import {ipcRenderer} from 'electron'
+  import log from 'electron-log'
   import Console from '@components/ConsolePage/Console'
+  import * as constant from '@utils/Constant'
   
   export default {
     name: 'tabbar',
     data () {
       return {
+        updateVersion: '',
+        updateDetails: ''
       }
     },
-    computed: {
-    },
     mounted () {
-      console.log('node: ' + process.versions.node,
+      log.info('node: ' + process.versions.node,
         'electron: ' + process.versions['atom-shell'],
         'platform: ' + require('os').platform(),
         'vue: ' + require('vue/package.json').version)
+
+      // setTimeout(() => this.$refs.modalUpdate.show(), 5000)
+      ipcRenderer.on(constant.EVENT_UPDATE, (event, info) => {
+        // this.updateVersion = info
+        this.updateDetails = info
+        this.$refs.modalUpdate.show()
+      })
     },
     methods: {
+      onUpdateNow (evt) {
+        ipcRenderer.send(constant.EVENT_UPDATE, constant.MSG_UPDATE_NOW)
+        this.$refs.modalUpdate.hide()
+      },
+      onUpdateOnQuit (evt) {
+        ipcRenderer.send(constant.EVENT_UPDATE, constant.MSG_UPDATE_ON_QUIT)
+        this.$refs.modalUpdate.hide()
+      },
+      onNoUpdate (evt) {
+        ipcRenderer.send(constant.EVENT_UPDATE, constant.MSG_NO_UPDATE)
+        this.$refs.modalUpdate.hide()
+      }
     },
     components: {
       'iot-console': Console

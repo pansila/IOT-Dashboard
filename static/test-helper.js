@@ -10,12 +10,12 @@ try {
 let script
 
 function exit () {
-  print2log('<= script "' + script.slice(0, -3) + '" exits')
+  print('<= script "' + script.slice(0, -3) + '" exits')
   process.disconnect()
   process.exit()
 }
 
-function print2log (data) {
+function print (data) {
   process.send({event: constant.EVENT_PRINT_LOG, data: data})
 }
 
@@ -62,4 +62,4 @@ function scriptInit (data) {
   script = data
 }
 
-export {exit, command2term, command2local, print2log, scriptInit, sleep, listen}
+export {exit, command2term, command2local, print, scriptInit, sleep, listen}
