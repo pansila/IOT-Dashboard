@@ -57,7 +57,6 @@
 
 <script>
   import {ipcRenderer} from 'electron'
-  import log from 'electron-log'
   import Console from '@components/ConsolePage/Console'
   import * as constant from '@utils/Constant'
   
@@ -70,11 +69,6 @@
       }
     },
     mounted () {
-      log.info('node: ' + process.versions.node,
-        'electron: ' + process.versions['atom-shell'],
-        'platform: ' + require('os').platform(),
-        'vue: ' + require('vue/package.json').version)
-
       // setTimeout(() => this.$refs.modalUpdate.show(), 5000)
       ipcRenderer.on(constant.EVENT_UPDATE, (event, info) => {
         // this.updateVersion = info

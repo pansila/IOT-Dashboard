@@ -6,7 +6,9 @@ import {fork} from 'child_process'
 import * as constant from '@utils/Constant.js'
 import { autoUpdater } from 'electron-updater'
 import log from 'electron-log'
-import config from '@config/config.json'
+// import fs from 'fs'
+// import asar from 'asar'
+import settings from 'electron-settings'
 
 log.transports.file.level = 'debug'
 
@@ -17,6 +19,11 @@ log.transports.file.level = 'debug'
 if (process.env.NODE_ENV !== 'development') {
   global.__static = require('path').join(__dirname, '/static').replace(/\\/g, '\\\\')
 }
+
+log.info('node: ' + process.versions.node,
+  'electron: ' + process.versions['atom-shell'],
+  'platform: ' + require('os').platform(),
+  'vue: ' + require('vue/package.json').version)
 
 let mainWindow
 const winURL = process.env.NODE_ENV === 'development'
@@ -125,17 +132,41 @@ ipcMain.on(constant.EVENT_ASYNC_MSG, (ev, arg) => {
   }
 })
 
+// const configDir = path.join(__dirname, '..', '..', '..', '..', 'config')
+// const appAsar = path.join(__dirname, '..', '..', '..', 'app.asar')
+
+function releaseStaticResource () {
+  // let init = 100
+  // asar.listPackage(appAsar).forEach(n => { if (init) { log.debug(n); init-- } if (n.startsWith('dist')) log.debug(n) })
+  // log.debug(configDir, appAsar)
+
+  // IOT-Dashboard\resources\app.asar\dist\electron\xxx
+  // fs.stat(configDir, (err, stats) => {
+  //   if (err) {
+  //     log.error(err)
+  //     fs.mkdirSync(configDir)
+  //   } else {
+  //     if (stats.isFile()) {
+  //       log.error(configDir + 'should be a directory')
+  //       return
+  //     }
+  //   }
+  //   // log.debug(asar.listPackage(appAsar).indexOf('\dist\electron\static\config\config.json.template'))
+  //   // asar.extractFile(appAsar, 'dist/electron/static/config/config.json.template').pipe(fs.createWriteStream(path.join(configDir, 'config.json.template')))
+  //   // fs.copyFileSync(path.join(configAsar, 'config.json.template'), path.join(configDir, 'config.json.template'))
+  // })
+}
+
 app.on('ready', () => {
   if (process.env.NODE_ENV === 'production') {
     let updateCheckTimer
-    autoUpdater.logger = log
-    if (config.updateServer) {
-      try {
-        autoUpdater.setFeedURL(config.updateServer)
-      } catch (err) {
-        log.error(err)
-      }
+    releaseStaticResource()
+
+    if (settings.has('updateServer')) {
+      autoUpdater.setFeedURL(settings.get('updateServer'))
     }
+
+    autoUpdater.logger = log
     autoUpdater.checkForUpdates()
     ipcMain.on(constant.EVENT_UPDATE, (e, action) => {
       switch (action) {

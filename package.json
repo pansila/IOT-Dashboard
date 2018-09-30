@@ -1,6 +1,6 @@
 {
   "name": "IOT-Dashboard",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "author": "Pansila <panzilla@163.com>",
   "description": "A debug tool helping with WiFi IOT development",
   "license": "MIT",
@@ -29,11 +29,7 @@
       "output": "build"
     },
     "publish": [
-      "github",
-      {
-        "provider": "generic",
-        "url": "http://127.0.0.1:8000/"
-      }
+      "github"
     ],
     "nsis": {
       "artifactName": "${productName}-${version}.${ext}"
@@ -78,6 +74,7 @@
     "babel-register": "^6.24.1",
     "bootstrap-vue": "^2.0.0-rc.11",
     "electron-log": "^2.2.17",
+    "electron-settings": "^3.2.0",
     "electron-updater": "^3.1.2",
     "serialport": "^6.2.2",
     "through2": "^2.0.3",
