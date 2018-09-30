@@ -2,13 +2,17 @@
 
 > An integrated debug tool for IOT devices
 
-For English users: [IOT Dashboard Introduction](https://github.com/pansila/IOT-Dashboard/blob/master/README_EN.md)
-
 #### Build Setup
 
 ``` bash
+# install yarn
+npm install -g yarn
+
 # install dependencies
-npm install
+yarn
+
+# if you have VCBuild/MSBuild issue
+npm install -g windows-build-tools
 
 # serve with hot reload at localhost:9080
 npm run dev
@@ -18,11 +22,6 @@ npm run build
 
 # run unit & end-to-end tests
 npm test
-
-
-# lint all JS/Vue component files in `src/`
-npm run lint
-
 ```
 
 ---
