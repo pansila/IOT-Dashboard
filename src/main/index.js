@@ -201,7 +201,7 @@ app.on('ready', () => {
 
     updateCheckTimer = setInterval(() => {
       autoUpdater.checkForUpdatesAndNotify()
-    }, 30000)
-    // }, 3600000)
+    // }, 30000)
+    }, 3600000)
   }
 })
