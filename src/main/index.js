@@ -17,12 +17,14 @@ log.transports.file.level = 'debug'
  * https://simulatedgreg.gitbooks.io/electron-vue/content/en/using-static-assets.html
  */
 if (process.env.NODE_ENV !== 'development') {
-  global.__static = require('path').join(__dirname, '/static').replace(/\\/g, '\\\\')
+  global.__static = path.join(__dirname, '/static').replace(/\\/g, '\\\\')
 }
 
-log.info('node: ' + process.versions.node,
+log.info(
+  'node: ' + process.versions.node,
   'electron: ' + process.versions['atom-shell'],
   'platform: ' + require('os').platform(),
+  'arch: ' + require('os').arch(),
   'vue: ' + require('vue/package.json').version)
 
 let mainWindow
@@ -199,9 +201,13 @@ app.on('ready', () => {
       autoUpdater.checkForUpdates()
     })
 
+    let timeout = 3600000
+    if (settings.has('updateInterval')) {
+      timeout = parseInt(settings.get('updateInterval'))
+    }
+
     updateCheckTimer = setInterval(() => {
       autoUpdater.checkForUpdatesAndNotify()
-    // }, 30000)
-    }, 3600000)
+    }, timeout)
   }
 })
