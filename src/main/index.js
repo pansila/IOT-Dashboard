@@ -23,7 +23,7 @@ if (process.env.NODE_ENV !== 'development') {
 log.info(
   'app: ' + app.getVersion().toString(),
   'node: ' + process.versions.node,
-  'electron: ' + process.versions['atom-shell'],
+  'electron: ' + process.versions.electron,
   'platform: ' + require('os').platform(),
   'arch: ' + require('os').arch(),
   'vue: ' + require('vue/package.json').version)

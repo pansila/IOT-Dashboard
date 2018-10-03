@@ -6,7 +6,7 @@
 
 <script>
   export default {
-    name: 'wifidashboard'
+    name: 'iot-dashboard'
   }
 </script>
 
