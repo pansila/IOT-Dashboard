@@ -54,6 +54,22 @@ log.log位置
 * macOS: ~/Library/Logs/IOT-Dashboard/log.log
 * Linux: ~/.config/IOT-Dashboard/log.log
 
+#### 用户配置
+所有以下划线"_"开头的都是注释字段，将下划线去掉后，字段生效。
+* updateServer
+  
+  指定更新服务器，默认的github国内网速不佳，可以候选服务器Amazon S3, DigitalOcean Spaces, Bintray甚至自建的HTTP(s)服务器(最简单的python -m SimpleHTTPServer)
+* updateInterval
+  
+  检查更新的时间间隔，默认1小时，单位毫秒
+
+* highlight
+
+  高亮规则
+* serialports
+  
+  串口配置信息，为指定串口保存配置信息以便下次重新使用，包括串口本身配置，如波特率，数据位，停止位等，以及历史命令等
+
 #### 脚本系统
 测试脚本支持ES6+语法，自带的test.js脚本有基本的使用例子。推荐在每个脚本的开头，引入test-helper.js模块，该模块提供了一些辅助函数来帮助更容易地编写测试用例，尤其是通过引入async/await语法，将嵌入式开发者不熟悉的js回调编程方式，转换成了类似C语言的过程式编程方式，更易于理解和编写。
 

@@ -2,7 +2,7 @@
   "name": "IOT-Dashboard",
   "version": "0.1.6",
   "author": "Pansila <panzilla@163.com>",
-  "description": "A debug tool helping with WiFi IOT development",
+  "description": "An integreted debug tool for IOT devices, powered by electron, bootstrap, vue, xterm, G2, etc.",
   "license": "MIT",
   "main": "./dist/electron/main.js",
   "scripts": {

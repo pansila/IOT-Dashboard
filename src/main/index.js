@@ -21,6 +21,7 @@ if (process.env.NODE_ENV !== 'development') {
 }
 
 log.info(
+  'app: ' + app.getVersion().toString(),
   'node: ' + process.versions.node,
   'electron: ' + process.versions['atom-shell'],
   'platform: ' + require('os').platform(),
@@ -192,9 +193,9 @@ app.on('ready', () => {
           break
       }
     })
-    autoUpdater.on('update-downloaded', (event, info) => {
-      log.debug(info)
-      mainWindow.webContents.send(constant.EVENT_UPDATE, info)
+    autoUpdater.on('update-downloaded', event => {
+      log.debug(event)
+      mainWindow.webContents.send(constant.EVENT_UPDATE, event)
     })
 
     ipcMain.on(constant.EVENT_CHECK_FOR_UPDATE, () => {
