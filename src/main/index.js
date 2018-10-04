@@ -6,8 +6,6 @@ import {fork} from 'child_process'
 import * as constant from '@utils/Constant.js'
 import { autoUpdater } from 'electron-updater'
 import log from 'electron-log'
-// import fs from 'fs'
-// import asar from 'asar'
 import settings from 'electron-settings'
 
 log.transports.file.level = 'debug'

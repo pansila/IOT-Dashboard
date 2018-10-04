@@ -1,4 +1,3 @@
-import through2 from 'through2'
 import ansi from 'ansi-styles'
 import { Stream } from 'stream'
 
@@ -35,32 +34,50 @@ class TimestampPrefix extends Stream.Transform {
   }
 }
 
-function LineBreaker (implicitCarriage, implicitLineFeed) {
-  return through2.obj(function (line, _, next) {
-    let position
+class LineBreaker extends Stream.Transform {
+  newlineReg = new RegExp(/((\r\n|\n\r)*?|.|^)\n\r/g)
+  implicitCarriageReg = new RegExp(/((\r\n)+|[^\r]|^)\n($|[^\r]|(\r\n)+)/g)
+  implicitLineFeedReg = new RegExp(/((\r\n)+|[^\n]|^)\r(?!\n)/g)
+  implicitCarriage
+  implicitLineFeed
+  position
+
+  constructor (implicitCarriage, implicitLineFeed) {
+    super({
+      readableObjectMode: true,
+      writableObjectMode: true
+    })
+    this.implicitCarriage = implicitCarriage
+    this.implicitLineFeed = implicitLineFeed
+  }
+
+  _transform (line, enc, next) {
     line = line.toString()
 
     // console.log('lineparser before', line)
     // console.log('lineparser before', Buffer.from(line))
     // line = line.replace(/(?<!\r)\n\r(?!\n)/g, '\r\n')
-    line = line.replace(/((\r\n|\n\r)*?|.|^)\n\r/g, '$1\r\n')
+    // line = line.replace(/((\r\n|\n\r)*?|.|^)\n\r/g, '$1\r\n')
+    line = line.replace(this.newlineReg, '$1\r\n')
     // console.log('lineparser 0', Buffer.from(line))
-    if (implicitCarriage) line = line.replace(/((\r\n)+|[^\r]|^)\n($|[^\r]|(\r\n)+)/g, '$1\r\n$3')
+    // if (implicitCarriage) line = line.replace(/((\r\n)+|[^\r]|^)\n($|[^\r]|(\r\n)+)/g, '$1\r\n$3')
+    if (this.implicitCarriage) line = line.replace(this.implicitCarriageReg, '$1\r\n$3')
     // console.log('lineparser 1', Buffer.from(line))
-    if (implicitLineFeed) line = line.replace(/((\r\n)+|[^\n]|^)\r(?!\n)/g, '$1\r\n')
+    // if (implicitLineFeed) line = line.replace(/((\r\n)+|[^\n]|^)\r(?!\n)/g, '$1\r\n')
+    if (this.implicitLineFeed) line = line.replace(this.implicitLineFeedReg, '$1\r\n')
     // console.log('lineparser 2', Buffer.from(line))
     // console.log('lineparser after', Buffer.from(line))
 
     let data = line
-    while ((position = data.indexOf('\r\n')) !== -1) {
-      // console.log(Buffer.from(data.slice(0, position + 2)))
-      this.push(data.slice(0, position + 2))
-      data = data.slice(position + 2)
+    while ((this.position = data.indexOf('\r\n')) !== -1) {
+      // console.log(Buffer.from(data.slice(0, this.position + 2)))
+      this.push(data.slice(0, this.position + 2))
+      data = data.slice(this.position + 2)
     }
     // console.log(Buffer.from(data))
     if (data !== '') this.push(data)
     next()
-  }, done => done())
+  }
 }
 
 /* join the split words resulting of serial port output delay to form a line */

@@ -10,8 +10,7 @@
           <b-card-img bottom src="https://picsum.photos/600/200/?image=25" />
         </b-tab>
         <b-tab no-body title="自动测试">
-          <b-card-header>Coming Soon...</b-card-header>
-          <b-card-img bottom src="https://picsum.photos/600/200/?image=23" />
+          <webview ref="foo" :src="webURL" class="iot-d-flex-grow"></webview>
         </b-tab>
         <b-tab no-body title="文档查询">
           <b-card-header>Coming Soon...</b-card-header>
@@ -59,16 +58,21 @@
   import {ipcRenderer} from 'electron'
   import Console from '@components/ConsolePage/Console'
   import * as constant from '@utils/Constant'
+  import settings from 'electron-settings'
   
   export default {
     name: 'tabbar',
     data () {
       return {
         updateVersion: '',
-        updateDetails: ''
+        updateDetails: '',
+        webURL: 'http://localhost:8080/'
       }
     },
     mounted () {
+      if (settings.has('testWebServer')) {
+        this.webURL = settings.get('testWebServer')
+      }
       // setTimeout(() => this.$refs.modalUpdate.show(), 5000)
       ipcRenderer.on(constant.EVENT_UPDATE, (event, info) => {
         // this.updateVersion = info

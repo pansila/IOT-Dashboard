@@ -102,6 +102,14 @@ export default {
       // this.term.attach(this.terminalSocket)
       this.term.fit()
       this.term._initialized = true
+      this.term.attachCustomKeyDownHandler(function (e) {
+        // Ctrl + Shift + C
+        if (e.ctrlKey && e.shiftKey && (e.keyCode === 3)) {
+          let copySucceeded = document.execCommand('copy')
+          console.log('copy succeeded', copySucceeded)
+          return false
+        }
+      })
       this.term.on('key', (data, ev) => {
         const printable = !ev.altKey && !ev.altGraphKey && !ev.ctrlKey && !ev.metaKey
 
