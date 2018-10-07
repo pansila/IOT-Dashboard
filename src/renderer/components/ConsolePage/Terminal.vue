@@ -13,7 +13,7 @@ import 'xterm/dist/xterm.css'
 import resizesensor from '@components/ResizeSensor'
 import SerialPort from 'serialport'
 import Highlighter from '@utils/Highlighter'
-import {LineBreaker, LineParser, TimestampPrefix, KeywordFilter} from '@utils/Common.js'
+import {LineParser, LineBuffer, TimestampPrefix, KeywordFilter} from '@utils/Common.js'
 import {PassThrough} from 'stream'
 import fs from 'fs'
 import path from 'path'
@@ -71,8 +71,8 @@ export default {
       // promptOffset: 0,
       highlightConfig: null,
       /* pipes */
-      lineBreaker: null,
       lineParser: null,
+      lineBuffer: null,
       highlighter: null,
       timestampPrefix: null,
       keywordFilter: null
@@ -167,7 +167,7 @@ export default {
             // this.term.write('\r')
           }
           this.input = ''
-          this.lineParser.expectPrompt()
+          this.lineBuffer.expectPrompt()
         } else if (ev.keyCode === 8) {
           if (this.input.length > 0) {
             this.term.write('\b \b')
@@ -213,8 +213,8 @@ export default {
       this.serialport = port
       this.setupTerminal()
 
-      this.lineBreaker = LineBreaker(this.terminal.implicitCarriageEnabled, this.terminal.implicitLineFeedEnabled)
-      this.lineParser = new LineParser()
+      this.lineParser = LineParser(this.terminal.implicitCarriageEnabled, this.terminal.implicitLineFeedEnabled)
+      this.lineBuffer = new LineBuffer()
       this.highlighter = this.terminal.highlightEnabled ? Highlighter(this.highlightConfig) : new PassThrough()
       this.timestampPrefix = this.terminal.timestampEnabled ? new TimestampPrefix() : new PassThrough()
       this.keywordFilter = new KeywordFilter()
@@ -222,9 +222,9 @@ export default {
       port.on('close', e => { this.serialport = null; console.log('Close', e) })
       port.on('error', alert)
       port
-        .pipe(this.lineBreaker)
-        .pipe(this.timestampPrefix)
         .pipe(this.lineParser)
+        .pipe(this.timestampPrefix)
+        .pipe(this.lineBuffer)
         .pipe(this.keywordFilter)
         .pipe(this.highlighter)
         .on('data', data => {

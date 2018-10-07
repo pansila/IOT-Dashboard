@@ -25,6 +25,7 @@
   "build": {
     "productName": "IOT-Dashboard",
     "appId": "io.github.pansila",
+    "npmSkipBuildFromSource": false,
     "directories": {
       "output": "build"
     },
@@ -105,7 +106,6 @@
     "electron-builder": "^20.19.2",
     "electron-debug": "^1.5.0",
     "electron-devtools-installer": "^2.2.4",
-    "electron-rebuild": "^1.8.2",
     "eslint": "^4.19.1",
     "eslint-config-standard": "^11.0.0",
     "eslint-friendly-formatter": "^4.0.1",
@@ -135,6 +135,7 @@
     "require-dir": "^1.0.0",
     "sass-loader": "^7.0.3",
     "spectron": "^3.8.0",
+    "string-to-stream": "^1.1.1",
     "style-loader": "^0.21.0",
     "url-loader": "^1.0.1",
     "vue-html-loader": "^1.2.4",

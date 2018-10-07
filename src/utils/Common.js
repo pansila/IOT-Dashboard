@@ -34,10 +34,11 @@ class TimestampPrefix extends Stream.Transform {
   }
 }
 
-class LineBreaker extends Stream.Transform {
+class LineParser extends Stream.Transform {
+  // newlineReg = new RegExp(/(?<!\r)\n\r(?!\n)/g)
   newlineReg = new RegExp(/((\r\n|\n\r)*?|.|^)\n\r/g)
   implicitCarriageReg = new RegExp(/((\r\n)+|[^\r]|^)\n($|[^\r]|(\r\n)+)/g)
-  implicitLineFeedReg = new RegExp(/((\r\n)+|[^\n]|^)\r(?!\n)/g)
+  implicitLineFeedReg = new RegExp(/\r(?!\n)/g)
   implicitCarriage
   implicitLineFeed
   position
@@ -56,15 +57,11 @@ class LineBreaker extends Stream.Transform {
 
     // console.log('lineparser before', line)
     // console.log('lineparser before', Buffer.from(line))
-    // line = line.replace(/(?<!\r)\n\r(?!\n)/g, '\r\n')
-    // line = line.replace(/((\r\n|\n\r)*?|.|^)\n\r/g, '$1\r\n')
     line = line.replace(this.newlineReg, '$1\r\n')
     // console.log('lineparser 0', Buffer.from(line))
-    // if (implicitCarriage) line = line.replace(/((\r\n)+|[^\r]|^)\n($|[^\r]|(\r\n)+)/g, '$1\r\n$3')
     if (this.implicitCarriage) line = line.replace(this.implicitCarriageReg, '$1\r\n$3')
     // console.log('lineparser 1', Buffer.from(line))
-    // if (implicitLineFeed) line = line.replace(/((\r\n)+|[^\n]|^)\r(?!\n)/g, '$1\r\n')
-    if (this.implicitLineFeed) line = line.replace(this.implicitLineFeedReg, '$1\r\n')
+    if (this.implicitLineFeed) line = line.replace(this.implicitLineFeedReg, '\r\n')
     // console.log('lineparser 2', Buffer.from(line))
     // console.log('lineparser after', Buffer.from(line))
 
@@ -81,7 +78,7 @@ class LineBreaker extends Stream.Transform {
 }
 
 /* join the split words resulting of serial port output delay to form a line */
-class LineParser extends Stream.Transform {
+class LineBuffer extends Stream.Transform {
   buffer = ''
   timerID = undefined
   prompt = false
@@ -94,6 +91,7 @@ class LineParser extends Stream.Transform {
   }
 
   _transform (line, enc, next) {
+    line = line.toString()
     if (line.endsWith('\r\n')) {
       this.push(this.buffer + line)
       if (this.timerID) {
@@ -104,7 +102,7 @@ class LineParser extends Stream.Transform {
     } else {
       if (this.buffer === '') {
         /* workaround to flush prompt characters immediately to avoid prompt lag,
-         * it makes LineParser dependent on the output structure of TimestampPrefix
+         * it makes LineBuffer dependent on the output structure of TimestampPrefix
          * TODO: a better way to decouple
          */
         if (line.startsWith('\x1b\x5b')) {
@@ -201,4 +199,4 @@ class KeywordFilter extends Stream.Transform {
   }
 }
 
-export {LineBreaker, LineParser, TimestampPrefix, KeywordFilter}
+export {LineParser, LineBuffer, TimestampPrefix, KeywordFilter}

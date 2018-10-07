@@ -115,6 +115,7 @@ function startMain () {
 
 function startElectron () {
   var args = [
+    // '--js-flags="--harmony-regexp-lookbehind"',
     '--inspect=5858',
     path.join(__dirname, '../dist/electron/main.js')
   ]
