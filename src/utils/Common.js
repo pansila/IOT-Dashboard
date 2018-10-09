@@ -35,10 +35,7 @@ class TimestampPrefix extends Stream.Transform {
 }
 
 class LineParser extends Stream.Transform {
-  // newlineReg = new RegExp(/(?<!\r)\n\r(?!\n)/g)
-  newlineReg = new RegExp(/((\r\n|\n\r)*?|.|^)\n\r/g)
-  implicitCarriageReg = new RegExp(/((\r\n)+|[^\r]|^)\n($|[^\r]|(\r\n)+)/g)
-  implicitLineFeedReg = new RegExp(/\r(?!\n)/g)
+  newlineReg = new RegExp(/\r\n|\n\r/g)
   implicitCarriage
   implicitLineFeed
   position
@@ -50,28 +47,23 @@ class LineParser extends Stream.Transform {
     })
     this.implicitCarriage = implicitCarriage
     this.implicitLineFeed = implicitLineFeed
+
+    if (this.implicitCarriage) this.implicitCarriageReg = new RegExp(/\r\n|\n/g)
+    if (this.implicitLineFeed) this.implicitLineFeedReg = new RegExp(/\r\n|\r/g)
   }
 
   _transform (line, enc, next) {
     line = line.toString()
 
-    // console.log('lineparser before', line)
-    // console.log('lineparser before', Buffer.from(line))
-    line = line.replace(this.newlineReg, '$1\r\n')
-    // console.log('lineparser 0', Buffer.from(line))
-    if (this.implicitCarriage) line = line.replace(this.implicitCarriageReg, '$1\r\n$3')
-    // console.log('lineparser 1', Buffer.from(line))
+    line = line.replace(this.newlineReg, '\r\n')
+    if (this.implicitCarriage) line = line.replace(this.implicitCarriageReg, '\r\n')
     if (this.implicitLineFeed) line = line.replace(this.implicitLineFeedReg, '\r\n')
-    // console.log('lineparser 2', Buffer.from(line))
-    // console.log('lineparser after', Buffer.from(line))
 
     let data = line
     while ((this.position = data.indexOf('\r\n')) !== -1) {
-      // console.log(Buffer.from(data.slice(0, this.position + 2)))
       this.push(data.slice(0, this.position + 2))
       data = data.slice(this.position + 2)
     }
-    // console.log(Buffer.from(data))
     if (data !== '') this.push(data)
     next()
   }
@@ -159,6 +151,8 @@ class KeywordFilter extends Stream.Transform {
   }
 
   _transform (line, enc, next) {
+    line = line.toString()
+
     if (line.endsWith('\r\n')) {
       this.findKeyword(this.buffer + line)
       if (this.timerID) {

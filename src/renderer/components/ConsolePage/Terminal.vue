@@ -102,14 +102,14 @@ export default {
       // this.term.attach(this.terminalSocket)
       this.term.fit()
       this.term._initialized = true
-      this.term.attachCustomKeyDownHandler(function (e) {
-        // Ctrl + Shift + C
-        if (e.ctrlKey && e.shiftKey && (e.keyCode === 3)) {
-          let copySucceeded = document.execCommand('copy')
-          console.log('copy succeeded', copySucceeded)
-          return false
-        }
-      })
+      // this.term.attachCustomKeyDownHandler(function (e) {
+      //   // Ctrl + Shift + C
+      //   if (e.ctrlKey && e.shiftKey && (e.keyCode === 3)) {
+      //     let copySucceeded = document.execCommand('copy')
+      //     console.log('copy succeeded', copySucceeded)
+      //     return false
+      //   }
+      // })
       this.term.on('key', (data, ev) => {
         const printable = !ev.altKey && !ev.altGraphKey && !ev.ctrlKey && !ev.metaKey
 
@@ -213,7 +213,7 @@ export default {
       this.serialport = port
       this.setupTerminal()
 
-      this.lineParser = LineParser(this.terminal.implicitCarriageEnabled, this.terminal.implicitLineFeedEnabled)
+      this.lineParser = new LineParser(this.terminal.implicitCarriageEnabled, this.terminal.implicitLineFeedEnabled)
       this.lineBuffer = new LineBuffer()
       this.highlighter = this.terminal.highlightEnabled ? Highlighter(this.highlightConfig) : new PassThrough()
       this.timestampPrefix = this.terminal.timestampEnabled ? new TimestampPrefix() : new PassThrough()

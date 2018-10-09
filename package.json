@@ -33,7 +33,7 @@
       "github"
     ],
     "nsis": {
-      "artifactName": "${productName}-${version}.${ext}"
+      "artifactName": "${productName}-Setup-${version}-${os}-${arch}.${ext}"
     },
     "files": [
       "dist/electron/**/*",
