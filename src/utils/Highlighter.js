@@ -59,7 +59,6 @@ function buildAnsiColor (colorsStr) {
     let colorStr = colorsArray[i]
     ansiOpen += ansi[colorStr].open
     ansiClose = ansi[colorStr].close + ansiClose
-    // console.log(ansiOpen, ansiClose)
   }
   return {open: ansiOpen, close: ansiClose}
 }
@@ -225,7 +224,6 @@ function highlight (options) {
         }
         patternListStr += patternStr
       }
-      // console.log(patternListStr)
       highlightOption.patternRegex = new RegExp(patternListStr, 'g' + caseOption)
 
       // Cache color
@@ -233,9 +231,7 @@ function highlight (options) {
     }
   }
 
-  // console.log(JSON.stringify(options.highlightOptions, null, 2))
   function write (line, _, next) {
-    // console.log(line)
     this.push(highlightLine(line, options.highlightOptions))
     next()
   }

@@ -1,6 +1,7 @@
-// import {LineParser, LineBuffer, TimestampPrefix, KeywordFilter} from '@utils/Common.js'
-import {LineParser, LineBuffer, KeywordFilter} from '@utils/Common.js'
+import {LineParser, LineBuffer, TimestampPrefix, KeywordFilter} from '@utils/Common.js'
 import str from 'string-to-stream'
+import ansi from 'ansi-styles'
+import {sprintf} from 'sprintf-js'
 
 describe('Test utilities in Common.js', () => {
   describe('LineParser should replace line marks correctly', () => {
@@ -127,6 +128,33 @@ describe('Test utilities in Common.js', () => {
         done()
       })
     })
+
+    it('3. Buffer test with prompt', function (done) {
+      const lineSrc = '123'
+      const lineDst = '123'
+      let result = ''
+      const lineBuffer = new LineBuffer()
+
+      str.prototype._read = function () {
+        if (!this.ended) {
+          var self = this
+          process.nextTick(function () {
+            self.push(self._str)
+          })
+          setTimeout(() => self.push(null), 1)
+          this.ended = true
+        }
+      }
+
+      lineBuffer.expectPrompt()
+      str(lineSrc).pipe(lineBuffer).on('data', line => {
+        result += line
+      }).on('end', () => {
+        /* no need to check the delay time as pushing message after push(null) will throw an error */
+        expect(result).to.equal(lineDst)
+        done()
+      })
+    })
   })
 
   describe('KeywordFilter should find all occurrences of keywords of a line', () => {
@@ -140,9 +168,101 @@ describe('Test utilities in Common.js', () => {
 
       filter.keywordInstall(kw)
       filter.listen().then(data => {
+        filter.keywordUninstall()
         expect(data).to.equal(lineDst)
         done()
       }).catch(done)
+    })
+
+    it('2. Basic test with delayed messages', function (done) {
+      const lineSrc = 'hello world\r\nhello kitty\r\nhello doggy'
+      const kw = 'doggy'
+      const lineDst = 'hello doggy'
+      const filter = new KeywordFilter()
+
+      str.prototype._read = function () {
+        if (!this.ended) {
+          var self = this
+          process.nextTick(function () {
+            self.push(self._str)
+          })
+          setTimeout(() => self.push(null), 200)
+          this.ended = true
+        }
+      }
+
+      str(lineSrc).pipe(new LineParser(true, true)).pipe(filter)
+
+      filter.keywordInstall(kw)
+      filter.listen().then(data => {
+        expect(data).to.equal(lineDst)
+        done()
+      }).catch(done)
+    })
+  })
+
+  describe('TimestampPrefix should add correct timestamp to the start of the line', () => {
+    function ansi2regex (regexString) {
+      return regexString.split('').reduce((sum, cur) => {
+        sum.push(sprintf('\\u%04x', cur.charCodeAt(0)))
+        return sum
+      }, []).join('')
+    }
+    it('1. Basic test', function (done) {
+      const lineSrc = '\r\nhello world'
+      let timestamp = ansi2regex(ansi.bold.open + ansi.grey.open) +
+                      '\\d+:\\d+:\\d+\\.\\d+: ' +
+                      ansi2regex(ansi.grey.close + ansi.bold.close)
+      const lineDst = '\r\n' + timestamp + 'hello world'
+      const prefix = new TimestampPrefix()
+      let result = ''
+
+      str(lineSrc).pipe(new LineParser(true, true)).pipe(prefix).on('data', data => {
+        result += data
+      }).on('end', () => {
+        expect(result).to.match(new RegExp(lineDst))
+        done()
+      })
+    })
+
+    it('2. Delayed message', function (done) {
+      const lineSrc = '\r\n'
+      let timestamp = ansi2regex(ansi.bold.open + ansi.grey.open) +
+                      '\\d+:\\d+:\\d+\\.\\d+: ' +
+                      ansi2regex(ansi.grey.close + ansi.bold.close)
+      const lineDst = '\r\n' + timestamp + 'hello world'
+      const prefix = new TimestampPrefix()
+      const delay = 200
+      let result = ''
+      let time1
+      let time2
+
+      str.prototype._read = function () {
+        if (!this.ended) {
+          var self = this
+          process.nextTick(function () {
+            self.push(self._str)
+          })
+          setTimeout(() => {
+            self.push('hello world')
+            self.push(null)
+          }, delay)
+          this.ended = true
+        }
+      }
+
+      str(lineSrc).pipe(new LineParser(true, true)).pipe(prefix).on('data', data => {
+        if (data === '\r\n') {
+          time1 = Date.now()
+        } else {
+          time2 = Date.now()
+        }
+        result += data
+      }).on('end', () => {
+        expect(result).to.match(new RegExp(lineDst))
+        expect(time2 - time1).to.be.above(delay)
+        done()
+      })
     })
   })
 })

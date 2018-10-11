@@ -22,6 +22,7 @@ class TimestampPrefix extends Stream.Transform {
   }
 
   _transform (line, enc, next) {
+    line = line.toString()
     if (this.newline) {
       let d = new Date()
       let timestamp = d.toTimeString().slice(0, 8) + '.' + PadMilliseconds(d.getMilliseconds()) + ': '
