@@ -9,7 +9,7 @@ async function start () {
   command2term('wifi_scan')
   // listen to the keyword of interest, continue if found, throw an error if timeout
   try {
-    let data = await listen('complete', 5000)
+    let data = await listen('finished', 5000)
     print('found message: ' + data)
   } catch (err) {
     print(err.toString())

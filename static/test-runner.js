@@ -3,9 +3,9 @@
 require('babel-register')({
   'presets': [
     ['env', {
-      'targets': { 'node': 7 }
+      'targets': { 'node': 8 }
     }],
-    'stage-3'
+    'stage-0'
   ]
 })
 
