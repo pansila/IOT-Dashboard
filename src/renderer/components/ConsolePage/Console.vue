@@ -33,7 +33,7 @@
                     <b-btn class="flex-grow-1" variant="primary" @click="onRunScript">运行</b-btn>
                     <b-btn class="flex-grow-1" variant="warning" @click="onStopScript">停止</b-btn>
                     <b-btn class="" @click="onEditScript" v-b-modal.code-editor-modal>编辑</b-btn>
-                    <b-btn class="" @click="onAddScript">添加</b-btn>
+                    <b-btn class="" @click="onAddScript" v-b-modal.code-editor-modal>添加</b-btn>
                     <b-btn variant="danger" @click="onDeleteScript">删除</b-btn>
                   </b-button-group>
                 </div>
@@ -57,7 +57,8 @@
       +
     </b-nav-item>
     <iot-comm-config modalID="comm-config-modal"></iot-comm-config>
-    <iot-code-editor modalID="code-editor-modal"></iot-code-editor>
+    <iot-code-editor modalID="code-editor-modal"
+      :eventHub="editScriptEventHub" />
     <!-- Render this if no tabs -->
     <div slot="empty" style="margin: auto" class="h-100 text-center text-muted">
       没有打开的终端
@@ -84,9 +85,10 @@
       return {
         tabCounter: 0,
         scripts: [],
-        scriptSelected: 0,
+        scriptSelected: null,
         terminalEventHub: new Vue(),
-        scriptEventHub: new Vue()
+        scriptEventHub: new Vue(),
+        editScriptEventHub: new Vue()
       }
     },
     computed: {
@@ -95,6 +97,11 @@
         commList: state => state.terminal.commList,
         tabs: state => state.terminal.tabs
       })
+    },
+    watch: {
+      scriptSelected (value) {
+        this.editScriptEventHub.$emit(constant.EVENT_EDIT_SCRIPT, value + '.js')
+      }
     },
     mounted () {
       let scriptPath = path.join(__static, 'scripts')

@@ -112,7 +112,7 @@ npm test
 - [ ] 强化串口工具
   - [x] 可编程脚本交互
   - [x] 关键字高亮
-  - [ ] 脚本编辑工具
+  - [x] 脚本编辑工具
   - [ ] 串口网络共享
 - [ ] Travis CI集成
 - [ ] 分布式自动化测试
@@ -130,4 +130,4 @@ npm test
 
 ---
 
-This project was generated with [electron-vue](https://github.com/SimulatedGREG/electron-vue)@[4c6ee7b](https://github.com/SimulatedGREG/electron-vue/tree/4c6ee7bf4f9b4aa647a22ec1c1ca29c2e59c3645) using [vue-cli](https://github.com/vuejs/vue-cli). Documentation about the original structure can be found [here](https://simulatedgreg.gitbooks.io/electron-vue/content/index.html).
+This project was generated with [electron-vue](https://github.com/SimulatedGREG/electron-vue) using [vue-cli](https://github.com/vuejs/vue-cli). Documentation about the original structure can be found [here](https://simulatedgreg.gitbooks.io/electron-vue/content/index.html).
