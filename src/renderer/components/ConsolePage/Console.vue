@@ -32,7 +32,7 @@
                   <b-button-group size="sm">
                     <b-btn class="flex-grow-1" variant="primary" @click="onRunScript">运行</b-btn>
                     <b-btn class="flex-grow-1" variant="warning" @click="onStopScript">停止</b-btn>
-                    <b-btn class="" @click="onEditScript">编辑</b-btn>
+                    <b-btn class="" @click="onEditScript" v-b-modal.code-editor-modal>编辑</b-btn>
                     <b-btn class="" @click="onAddScript">添加</b-btn>
                     <b-btn variant="danger" @click="onDeleteScript">删除</b-btn>
                   </b-button-group>
@@ -57,6 +57,7 @@
       +
     </b-nav-item>
     <iot-comm-config modalID="comm-config-modal"></iot-comm-config>
+    <iot-code-editor modalID="code-editor-modal"></iot-code-editor>
     <!-- Render this if no tabs -->
     <div slot="empty" style="margin: auto" class="h-100 text-center text-muted">
       没有打开的终端
@@ -69,6 +70,7 @@
   import Terminal from '@components/ConsolePage/Terminal'
   import ScriptTerminal from '@components/ConsolePage/ScriptTerminal'
   import CommConfigModal from '@components/ConsolePage/CommConfigModal'
+  import CodeEditorModal from '@components/ConsolePage/CodeEditorModal'
   import {mapState} from 'vuex'
   import {ipcRenderer} from 'electron'
   import fs from 'fs'
@@ -180,7 +182,8 @@
     components: {
       'iot-terminal': Terminal,
       'iot-mini-terminal': ScriptTerminal,
-      'iot-comm-config': CommConfigModal
+      'iot-comm-config': CommConfigModal,
+      'iot-code-editor': CodeEditorModal
     }
   }
 </script>
