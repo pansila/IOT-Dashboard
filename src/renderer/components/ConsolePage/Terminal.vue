@@ -274,4 +274,8 @@ export default {
 </script>
 
 <style>
+/* let xterm-screen not to shade the scroll-bar of xterm-viewport */
+/* .xterm .xterm-screen {
+    margin-right: 20px;
+} */
 </style>
