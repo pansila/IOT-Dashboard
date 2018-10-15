@@ -249,15 +249,13 @@ export default {
     onResize (size) {
       if (this.term) {
         this.term.fit()
-        return
       }
-
-      this.setupSerialport()
-        .then(this.setup)
-        .catch(console.log)
     }
   },
   mounted () {
+    this.setupSerialport()
+      .then(this.setup)
+      .catch(console.log)
     let content = fs.readFileSync(path.join(__static, 'config', 'highlight.json'))
     this.highlightConfig = JSON.parse(content)
   },

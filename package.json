@@ -1,8 +1,8 @@
 {
-  "name": "IOT-Dashboard",
+  "name": "IoT-Dashboard",
   "version": "0.1.8",
   "author": "Pansila <panzilla@163.com>",
-  "description": "An integreted debug tool for IOT devices, powered by electron, bootstrap, vue, xterm, G2, etc.",
+  "description": "An integrated debug tool for IOT devices, powered by electron, bootstrap, vue, xterm, G2, etc.",
   "license": "MIT",
   "main": "./dist/electron/main.js",
   "scripts": {
@@ -23,7 +23,7 @@
     "postinstall": "npm run lint:fix && electron-builder install-app-deps"
   },
   "build": {
-    "productName": "IOT-Dashboard",
+    "productName": "IoT-Dashboard",
     "appId": "io.github.pansila",
     "npmSkipBuildFromSource": false,
     "directories": {
