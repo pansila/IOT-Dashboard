@@ -32,8 +32,8 @@
                   <b-button-group size="sm">
                     <b-btn class="flex-grow-1" variant="primary" @click="onRunScript">运行</b-btn>
                     <b-btn class="flex-grow-1" variant="warning" @click="onStopScript">停止</b-btn>
-                    <b-btn class="" @click="onEditScript" v-b-modal.code-editor-modal>编辑</b-btn>
-                    <b-btn class="" @click="onAddScript" v-b-modal.code-editor-modal>添加</b-btn>
+                    <b-btn class="" @click="onEditScript" v-b-modal.codeEditorModal>编辑</b-btn>
+                    <b-btn class="" @click="onAddScript" v-b-modal.codeEditorModal>添加</b-btn>
                     <b-btn variant="danger" @click="onDeleteScript">删除</b-btn>
                   </b-button-group>
                 </div>
@@ -53,11 +53,11 @@
         </b-btn>
       </div>
     </b-tab>
-    <b-nav-item slot="tabs" v-b-modal.comm-config-modal href="#">
+    <b-nav-item slot="tabs" v-b-modal.commConfigModal href="#">
       +
     </b-nav-item>
-    <iot-comm-config modalID="comm-config-modal"></iot-comm-config>
-    <iot-code-editor modalID="code-editor-modal"
+    <iot-comm-config modalID="commConfigModal"></iot-comm-config>
+    <iot-code-editor modalID="codeEditorModal"
       :eventHub="editScriptEventHub" />
     <!-- Render this if no tabs -->
     <div slot="empty" style="margin: auto" class="h-100 text-center text-muted">
@@ -100,29 +100,15 @@
     },
     watch: {
       scriptSelected (value) {
-        this.editScriptEventHub.$emit(constant.EVENT_EDIT_SCRIPT, value + '.js')
+        this.editScriptEventHub.$emit(constant.EVENT_UPDATE_SCRIPT, value + '.js')
       }
     },
     mounted () {
-      let scriptPath = path.join(__static, 'scripts')
-      fs.readdir(scriptPath, (err, files) => {
-        if (err) {
-          alert(err)
-          return
-        }
-        files.forEach(file => {
-          fs.stat(path.join(scriptPath, file), (err, stats) => {
-            if (err) {
-              alert(err)
-              return
-            }
-            if (stats.isFile()) {
-              if (file.endsWith('.js')) file = file.slice(0, -3)
-              this.scripts.push(file)
-            }
-          })
-        })
+      this.editScriptEventHub.$on(constant.EVENT_REFRESH_SCRIPT, value => {
+        this.scriptSelected = path.basename(value, '.js')
+        this.updateScriptList()
       })
+      this.updateScriptList()
 
       ipcRenderer.on(constant.EVENT_ASYNC_REPLY, (event, value) => {
         if (value.event) {
@@ -152,6 +138,28 @@
       })
     },
     methods: {
+      updateScriptList () {
+        this.scripts = []
+        let scriptPath = path.join(__static, 'scripts')
+        fs.readdir(scriptPath, (err, files) => {
+          if (err) {
+            alert(err)
+            return
+          }
+          files.forEach(file => {
+            fs.stat(path.join(scriptPath, file), (err, stats) => {
+              if (err) {
+                alert(err)
+                return
+              }
+              if (stats.isFile()) {
+                if (file.endsWith('.js')) file = file.slice(0, -3)
+                this.scripts.push(file)
+              }
+            })
+          })
+        })
+      },
       closeTab (i) {
         this.$store.commit('DEL_TAB', i)
         this.$store.commit('DEL_TERMINAL', i)
@@ -180,10 +188,19 @@
         })
       },
       onEditScript (e) {
+        this.editScriptEventHub.$emit(constant.EVENT_EDIT_SCRIPT)
       },
       onAddScript (e) {
+        this.editScriptEventHub.$emit(constant.EVENT_NEW_SCRIPT)
       },
       onDeleteScript (e) {
+        let scriptPath = path.join(__static, 'scripts', this.scriptSelected + '.js')
+        if (fs.existsSync(scriptPath)) {
+          fs.unlink(scriptPath, err => {
+            if (err) throw err
+            this.updateScriptList()
+          })
+        }
       }
     },
     components: {
