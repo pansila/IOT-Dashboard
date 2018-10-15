@@ -1,6 +1,6 @@
 {
   "name": "IOT-Dashboard",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "author": "Pansila <panzilla@163.com>",
   "description": "An integreted debug tool for IOT devices, powered by electron, bootstrap, vue, xterm, G2, etc.",
   "license": "MIT",
