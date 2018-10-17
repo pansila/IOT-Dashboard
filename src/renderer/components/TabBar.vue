@@ -73,10 +73,14 @@
       if (settings.has('testWebServer')) {
         this.webURL = settings.get('testWebServer')
       }
-      // setTimeout(() => this.$refs.modalUpdate.show(), 5000)
       ipcRenderer.on(constant.EVENT_UPDATE, (event, info) => {
-        // this.updateVersion = info
-        this.updateDetails = info
+        this.updateVersion = ''
+        this.updateDetails = ''
+        if (info) {
+          let {version, files: [{url: fileURL}], releaseDate} = info
+          this.updateVersion = '版本号: ' + version
+          this.updateDetails = '详细信息: ' + fileURL + ' released on ' + releaseDate
+        }
         this.$refs.modalUpdate.show()
       })
     },
