@@ -36,8 +36,12 @@
     </b-card>
     <div>
       <b-modal ref="modalUpdate" title="升级提示" centered>
-        <p class="my-4">{{updateVersion}}</p>
-        <p class="my-4">{{updateDetails}}</p>
+        <div>
+          <p>发现新版本</p>
+          <p>{{updateVersion}}</p>
+          <p>更新内容</p>
+          <div class="pl-3" v-html="updateDetails" />
+        </div>
         <div slot="modal-footer" class="w-100">
           <b-btn size="sm" class="float-right ml-2" variant="primary" @click="onUpdateNow">
             立即更新
@@ -77,9 +81,9 @@
         this.updateVersion = ''
         this.updateDetails = ''
         if (info) {
-          let {version, files: [{url: fileURL}], releaseDate} = info
-          this.updateVersion = '版本号: ' + version
-          this.updateDetails = '详细信息: ' + fileURL + ' released on ' + releaseDate
+          let {releaseDate, releaseName, releaseNotes} = info
+          this.updateVersion = releaseName + ' released on ' + new Date(releaseDate).toLocaleString()
+          this.updateDetails = releaseNotes
         }
         this.$refs.modalUpdate.show()
       })
