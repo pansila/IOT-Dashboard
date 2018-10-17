@@ -1,5 +1,3 @@
-// const path = require('path')
-
 require('babel-register')({
   'presets': [
     ['env', {

@@ -78,6 +78,8 @@
   import path from 'path'
   import Vue from 'vue'
   import * as constant from '@utils/Constant'
+  import settings from '@utils/Settings'
+  import scripts from '@utils/Scripts'
 
   export default {
     name: 'consolePage',
@@ -139,26 +141,10 @@
     },
     methods: {
       updateScriptList () {
-        this.scripts = []
-        let scriptPath = path.join(__static, 'scripts')
-        fs.readdir(scriptPath, (err, files) => {
-          if (err) {
-            alert(err)
-            return
-          }
-          files.forEach(file => {
-            fs.stat(path.join(scriptPath, file), (err, stats) => {
-              if (err) {
-                alert(err)
-                return
-              }
-              if (stats.isFile()) {
-                if (file.endsWith('.js')) file = file.slice(0, -3)
-                this.scripts.push(file)
-              }
-            })
-          })
-        })
+        if (settings.has('customScriptPath')) {
+          scripts.setPath(settings.get('customScriptPath'))
+        }
+        this.scripts = scripts._readScripts()
       },
       closeTab (i) {
         this.$store.commit('DEL_TAB', i)
