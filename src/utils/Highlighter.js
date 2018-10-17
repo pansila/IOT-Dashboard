@@ -194,9 +194,10 @@ function buildColorFromText (highlightColorArg, defaultStyle) {
  *
  */
 function highlight (options) {
+  if (!options) options = {options: []}
   // Transform highlight pattern into valid regexp.
-  for (let i = 0; i < options.highlightOptions.length; i++) {
-    let highlightOption = options.highlightOptions[i]
+  for (let i = 0; i < options.options.length; i++) {
+    let highlightOption = options.options[i]
     if (highlightOption) {
       // Regex case option
       let caseOption = options.caseSensitive ? '' : 'i' // Case sensitive is default regex option
@@ -232,7 +233,7 @@ function highlight (options) {
   }
 
   function write (line, _, next) {
-    this.push(highlightLine(line, options.highlightOptions))
+    this.push(highlightLine(line, options.options))
     next()
   }
 

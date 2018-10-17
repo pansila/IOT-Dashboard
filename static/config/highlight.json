@@ -1,5 +1,5 @@
 {
-  "highlightOptions": [
+  "options": [
     {
       "colorText": "red.bold",
       "patternArray": ["error", "fail", "failed"],

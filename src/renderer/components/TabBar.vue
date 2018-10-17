@@ -62,7 +62,7 @@
   import {ipcRenderer} from 'electron'
   import Console from '@components/ConsolePage/Console'
   import * as constant from '@utils/Constant'
-  import settings from 'electron-settings'
+  import settings from '@utils/Settings'
   
   export default {
     name: 'tabbar',
