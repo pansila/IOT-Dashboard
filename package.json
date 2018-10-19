@@ -37,7 +37,11 @@
     },
     "files": [
       "dist/electron/**/*",
-      "src/utils/Constant.js"
+      "src/utils/Constant.js",
+      "src/utils/Scripts.js"
+    ],
+    "asarUnpack": [
+      "dist/electron/static/**/*"
     ],
     "dmg": {
       "contents": [
@@ -77,6 +81,7 @@
     "ace-builds": "^1.4.1",
     "ansi-styles": "^3.2.1",
     "axios": "^0.18.0",
+    "babel-core": "^6.26.3",
     "babel-preset-env": "^1.7.0",
     "babel-register": "^6.26.0",
     "bootstrap-vue": "^2.0.0-rc.11",
@@ -93,7 +98,6 @@
   },
   "devDependencies": {
     "ajv": "^6.5.0",
-    "babel-core": "^6.26.3",
     "babel-eslint": "^8.2.3",
     "babel-loader": "^7.1.4",
     "babel-plugin-istanbul": "^4.1.6",

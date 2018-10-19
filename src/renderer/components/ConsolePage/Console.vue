@@ -107,7 +107,7 @@
     },
     mounted () {
       this.editScriptEventHub.$on(constant.EVENT_REFRESH_SCRIPT, value => {
-        this.scriptSelected = path.basename(value, '.js')
+        this.scriptSelected = path.basename(value)
         this.updateScriptList()
       })
       this.updateScriptList()
@@ -144,7 +144,7 @@
         if (settings.has('customScriptPath')) {
           scripts.setPath(settings.get('customScriptPath'))
         }
-        this.scripts = scripts._readScripts()
+        this.scripts = scripts.getScripts()
       },
       closeTab (i) {
         this.$store.commit('DEL_TAB', i)
@@ -163,14 +163,14 @@
         if (!this.scriptSelected) return
         ipcRenderer.send(constant.EVENT_ASYNC_MSG, {
           event: constant.EVENT_RUN_SCRIPT,
-          data: this.scriptSelected + '.js'
+          data: this.scriptSelected
         })
       },
       onStopScript (e) {
         if (!this.scriptSelected) return
         ipcRenderer.send(constant.EVENT_ASYNC_MSG, {
           event: constant.EVENT_STOP_SCRIPT,
-          data: this.scriptSelected + '.js'
+          data: this.scriptSelected
         })
       },
       onEditScript (e) {
@@ -180,7 +180,7 @@
         this.editScriptEventHub.$emit(constant.EVENT_NEW_SCRIPT)
       },
       onDeleteScript (e) {
-        let scriptPath = path.join(__static, 'scripts', this.scriptSelected + '.js')
+        let scriptPath = scripts.getScriptFilePath(this.scriptSelected)
         if (fs.existsSync(scriptPath)) {
           fs.unlink(scriptPath, err => {
             if (err) throw err

@@ -54,6 +54,7 @@ start()</div>
   import ace from 'ace-builds/src-noconflict/ace'
   import 'ace-builds/webpack-resolver'
   import * as constant from '@utils/Constant'
+  import scripts from '@utils/Scripts'
   
   export default {
     name: 'codeEditor',
@@ -77,7 +78,7 @@ start()</div>
       this.editor.session.setMode('ace/mode/javascript')
       this.codeTemplate = this.editor.getValue()
       this.eventHub.$on(constant.EVENT_UPDATE_SCRIPT, value => {
-        this.script = path.join(__static, 'scripts', value)
+        this.script = scripts.getScriptFilePath(value)
       })
       this.eventHub.$on(constant.EVENT_EDIT_SCRIPT, value => {
         if (!this.script) {
@@ -106,14 +107,14 @@ start()</div>
       onOk (evt) {
         if (this.newFile) {
           if (this.scriptName) {
-            this.script = path.join(__static, 'scripts', this.scriptName)
             if (path.extname(this.scriptName) === '') {
-              this.script += '.js'
+              this.script = this.scriptName + '.js'
             } else if (path.extname(this.scriptName) !== '.js') {
               alert('请保存为js文件')
               evt.preventDefault()
               return
             }
+            this.script = scripts.getScriptFilePath(this.script)
           } else {
             alert('请输入要保存的文件名')
             evt.preventDefault()
