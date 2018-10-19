@@ -78,7 +78,6 @@
   import path from 'path'
   import Vue from 'vue'
   import * as constant from '@utils/Constant'
-  import settings from '@utils/Settings'
   import scripts from '@utils/Scripts'
 
   export default {
@@ -141,9 +140,6 @@
     },
     methods: {
       updateScriptList () {
-        if (settings.has('customScriptPath')) {
-          scripts.setPath(settings.get('customScriptPath'))
-        }
         this.scripts = scripts.getScripts()
       },
       closeTab (i) {

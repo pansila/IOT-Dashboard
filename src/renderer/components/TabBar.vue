@@ -62,7 +62,8 @@
   import {ipcRenderer} from 'electron'
   import Console from '@components/ConsolePage/Console'
   import * as constant from '@utils/Constant'
-  import settings from '@utils/Settings'
+  // import settings from '@utils/Settings'
+  // import scripts from '@utils/Scripts'
   
   export default {
     name: 'tabbar',
@@ -74,9 +75,13 @@
       }
     },
     mounted () {
-      if (settings.has('testWebServer')) {
-        this.webURL = settings.get('testWebServer')
-      }
+      /** scripts is singleton, thus it needs to be initialized only once */
+      // if (settings.has('customScriptPath')) {
+      //   scripts.setPath(settings.get('customScriptPath'))
+      // }
+      // if (settings.has('testWebServer')) {
+      //   this.webURL = settings.get('testWebServer')
+      // }
       ipcRenderer.on(constant.EVENT_UPDATE, (event, info) => {
         this.updateVersion = ''
         this.updateDetails = ''
