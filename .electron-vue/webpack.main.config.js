@@ -9,7 +9,7 @@ const webpack = require('webpack')
 const BabiliWebpackPlugin = require('babili-webpack-plugin')
 
 let mainConfig = {
-  devtool: '#cheap-module-source-map',
+  // devtool: '#cheap-module-source-map',
   entry: {
     main: path.join(__dirname, '../src/main/index.js')
   },
@@ -32,7 +32,10 @@ let mainConfig = {
       {
         test: /\.js$/,
         use: 'babel-loader',
-        exclude: /node_modules/
+        exclude: [
+          /node_modules/,
+          path.resolve(__dirname, '../src/utils/Settings.js'),
+        ]
       },
       {
         test: /\.node$/,

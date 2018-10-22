@@ -18,7 +18,7 @@ import {PassThrough} from 'stream'
 import fs from 'fs'
 import path from 'path'
 import * as constant from '@utils/Constant'
-// import settings from '@utils/Settings'
+import settings from '@utils/Settings'
 
 Terminal.applyAddon(fit)
 // Terminal.applyAddon(attach)
@@ -257,12 +257,12 @@ export default {
     this.setupSerialport()
       .then(this.setup)
       .catch(console.log)
-    // if (settings.has('highlightOptions')) {
-    //   this.highlightConfig = settings.get('highlightOptions')
-    // } else {
-    const content = fs.readFileSync(path.join(__static, 'config', 'highlight.json'))
-    this.highlightConfig = JSON.parse(content)
-    // }
+    if (settings.has('highlightOptions')) {
+      this.highlightConfig = settings.get('highlightOptions')
+    } else {
+      const content = fs.readFileSync(path.join(__static, 'config', 'highlight.json'))
+      this.highlightConfig = JSON.parse(content)
+    }
   },
   beforeDestroy () {
     // this.term.detach(this.terminalSocket)

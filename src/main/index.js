@@ -6,9 +6,6 @@ import {fork} from 'child_process'
 import * as constant from '@utils/Constant'
 import { autoUpdater } from 'electron-updater'
 import log from 'electron-log'
-// import settings from 'electron-settings'
-// import { MySettings } from '@utils/Settings'
-// import MySettings from '@utils/Settings'
 import settings from '@utils/Settings'
 
 log.transports.file.level = 'debug'
@@ -139,7 +136,6 @@ ipcMain.on(constant.EVENT_ASYNC_MSG, (ev, arg) => {
 app.on('ready', () => {
   if (process.env.NODE_ENV === 'production') {
     let updateCheckTimer
-    // let settings = new MySettings()
 
     if (settings.has('updateServer')) {
       autoUpdater.setFeedURL(settings.get('updateServer'))
