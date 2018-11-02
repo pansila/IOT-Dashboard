@@ -36,12 +36,11 @@
       "artifactName": "${productName}-Setup-${version}-${os}.${ext}"
     },
     "files": [
-      "dist/electron/**/*",
-      "src/utils/Constant.js",
-      "src/utils/Scripts.js"
+      "dist/electron/**/*"
     ],
     "asarUnpack": [
-      "dist/electron/static/**/*"
+      "dist/electron/testrunner.js",
+      "dist/electron/testhelpr.js"
     ],
     "dmg": {
       "contents": [

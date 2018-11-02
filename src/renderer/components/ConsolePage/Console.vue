@@ -170,6 +170,7 @@
         })
       },
       onEditScript (e) {
+        console.log(123)
         this.editScriptEventHub.$emit(constant.EVENT_EDIT_SCRIPT)
       },
       onAddScript (e) {

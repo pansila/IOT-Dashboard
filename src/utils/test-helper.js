@@ -1,11 +1,5 @@
 import {exec} from 'child_process'
-
-let constant
-try {
-  constant = require('../../../../app.asar/src/utils/Constant')
-} catch (err) {
-  constant = require('../src/utils/Constant')
-}
+import * as constant from './Constant'
 
 let script
 

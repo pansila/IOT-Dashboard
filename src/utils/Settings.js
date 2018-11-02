@@ -1,6 +1,6 @@
-const Settings = require('electron-settings/lib/settings')
-const findLogPath = require('electron-log/lib/transports/file/find-log-path')
-const path = require('path')
+import Settings from 'electron-settings/lib/settings'
+import findLogPath from 'electron-log/lib/transports/file/find-log-path'
+import path from 'path'
 
 const defaultSettingsFileName = 'Settings'
 
@@ -14,4 +14,4 @@ class MySettings extends Settings {
   }
 }
 
-module.exports = new MySettings()
+export default new MySettings()

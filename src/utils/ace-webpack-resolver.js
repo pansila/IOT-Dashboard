@@ -1,0 +1,26 @@
+function setupAce (ace) {
+  ace.config.setModuleUrl('ace/mode/javascript_worker', require('file-loader!ace-builds/src-noconflict/worker-javascript.js'))
+  ace.config.setModuleUrl('ace/theme/twilight', require('file-loader!ace-builds/src-noconflict/theme-twilight.js'))
+  ace.config.setModuleUrl('ace/mode/javascript', require('file-loader!ace-builds/src-noconflict/mode-javascript.js'))
+  ace.config.setModuleUrl('ace/ext/beautify', require('file-loader!ace-builds/src-noconflict/ext-beautify.js'))
+  ace.config.setModuleUrl('ace/ext/elastic_tabstops_lite', require('file-loader!ace-builds/src-noconflict/ext-elastic_tabstops_lite.js'))
+  ace.config.setModuleUrl('ace/ext/emmet', require('file-loader!ace-builds/src-noconflict/ext-emmet.js'))
+  ace.config.setModuleUrl('ace/ext/error_marker', require('file-loader!ace-builds/src-noconflict/ext-error_marker.js'))
+  ace.config.setModuleUrl('ace/ext/keyboard_menu', require('file-loader!ace-builds/src-noconflict/ext-keybinding_menu.js'))
+  ace.config.setModuleUrl('ace/ext/language_tools', require('file-loader!ace-builds/src-noconflict/ext-language_tools.js'))
+  ace.config.setModuleUrl('ace/ext/linking', require('file-loader!ace-builds/src-noconflict/ext-linking.js'))
+  ace.config.setModuleUrl('ace/ext/modelist', require('file-loader!ace-builds/src-noconflict/ext-modelist.js'))
+  ace.config.setModuleUrl('ace/ext/options', require('file-loader!ace-builds/src-noconflict/ext-options.js'))
+  ace.config.setModuleUrl('ace/ext/rtl', require('file-loader!ace-builds/src-noconflict/ext-rtl.js'))
+  ace.config.setModuleUrl('ace/ext/searchbox', require('file-loader!ace-builds/src-noconflict/ext-searchbox.js'))
+  ace.config.setModuleUrl('ace/ext/settings_menu', require('file-loader!ace-builds/src-noconflict/ext-settings_menu.js'))
+  ace.config.setModuleUrl('ace/ext/spellcheck', require('file-loader!ace-builds/src-noconflict/ext-spellcheck.js'))
+  ace.config.setModuleUrl('ace/ext/split', require('file-loader!ace-builds/src-noconflict/ext-split.js'))
+  ace.config.setModuleUrl('ace/ext/static_highlight', require('file-loader!ace-builds/src-noconflict/ext-static_highlight.js'))
+  ace.config.setModuleUrl('ace/ext/statusbar', require('file-loader!ace-builds/src-noconflict/ext-statusbar.js'))
+  ace.config.setModuleUrl('ace/ext/textarea', require('file-loader!ace-builds/src-noconflict/ext-textarea.js'))
+  ace.config.setModuleUrl('ace/ext/themelist', require('file-loader!ace-builds/src-noconflict/ext-themelist.js'))
+  ace.config.setModuleUrl('ace/ext/whitespace', require('file-loader!ace-builds/src-noconflict/ext-whitespace.js'))
+}
+
+export default setupAce

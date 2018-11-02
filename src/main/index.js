@@ -69,7 +69,14 @@ app.on('activate', () => {
 
 let children = []
 function runScript (caller, scriptName) {
-  const child = fork(path.join(__static, 'test-runner.js'), {stdio: [0, 1, 2, 'ipc']})
+  let runnerPath
+  if (process.env.NODE_ENV === 'production') {
+    runnerPath = path.join(__dirname, 'testrunner.js')
+  } else {
+    runnerPath = path.join(__static, '../src/utils/test-runner.js')
+  }
+
+  const child = fork(runnerPath, {stdio: [0, 1, 2, 'ipc']})
   child.on('message', function (m) {
     caller.send(constant.EVENT_ASYNC_REPLY, m)
   })

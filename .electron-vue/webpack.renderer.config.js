@@ -25,7 +25,9 @@ let rendererConfig = {
   devtool: '#cheap-module-eval-source-map',
   // devtool: '#cheap-module-source-map',
   entry: {
-    renderer: path.join(__dirname, '../src/renderer/main.js')
+    renderer: path.join(__dirname, '../src/renderer/main.js'),
+    testhelper: path.join(__dirname, '../src/utils/test-helper.js'),
+    testrunner: path.join(__dirname, '../src/utils/test-runner.js')
   },
   externals: [
     ...Object.keys(dependencies || {}).filter(d => !whiteListedModules.includes(d))
@@ -66,7 +68,12 @@ let rendererConfig = {
       {
         test: /\.js$/,
         use: 'babel-loader',
-        exclude: /node_modules/
+        exclude: [
+          /node_modules/,
+          path.resolve(__dirname, '../src/utils/Settings.js'),
+          path.resolve(__dirname, '../src/utils/test-helper.js'),
+          path.resolve(__dirname, '../src/utils/test-runner.js')
+        ]
       },
       {
         test: /\.node$/,
@@ -135,7 +142,6 @@ let rendererConfig = {
         ? path.resolve(__dirname, '../node_modules')
         : false
     }),
-    new webpack.HotModuleReplacementPlugin(),
     new webpack.NoEmitOnErrorsPlugin()
   ],
   output: {
@@ -161,6 +167,7 @@ let rendererConfig = {
  */
 if (process.env.NODE_ENV !== 'production') {
   rendererConfig.plugins.push(
+    new webpack.HotModuleReplacementPlugin(),
     new webpack.DefinePlugin({
       '__static': `"${path.join(__dirname, '../static').replace(/\\/g, '\\\\')}"`
     })
@@ -174,6 +181,7 @@ if (process.env.NODE_ENV === 'production') {
   rendererConfig.devtool = ''
 
   rendererConfig.plugins.push(
+    // new BabiliWebpackPlugin({}, {test: /^(?!test-?helper).*\.js/i}),
     new BabiliWebpackPlugin(),
     new CopyWebpackPlugin([
       {

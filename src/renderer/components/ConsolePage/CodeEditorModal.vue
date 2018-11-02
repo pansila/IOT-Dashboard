@@ -52,10 +52,12 @@ start()</div>
   import path from 'path'
   import fs from 'fs'
   import ace from 'ace-builds/src-noconflict/ace'
-  import 'ace-builds/webpack-resolver'
+  import setupAce from '@utils/ace-webpack-resolver'
   import * as constant from '@utils/Constant'
   import scripts from '@utils/Scripts'
-  
+
+  setupAce(ace)
+
   export default {
     name: 'codeEditor',
     props: [
