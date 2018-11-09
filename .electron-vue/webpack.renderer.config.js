@@ -71,8 +71,8 @@ let rendererConfig = {
         exclude: [
           /node_modules/,
           path.resolve(__dirname, '../src/utils/Settings.js'),
-          path.resolve(__dirname, '../src/utils/test-helper.js'),
-          path.resolve(__dirname, '../src/utils/test-runner.js')
+          path.resolve(__dirname, '../src/utils/test-runner.js'),
+          path.resolve(__dirname, '../src/utils/test-helper.js')
         ]
       },
       {
@@ -170,8 +170,7 @@ if (process.env.NODE_ENV !== 'production') {
     new webpack.HotModuleReplacementPlugin(),
     new webpack.DefinePlugin({
       '__static': `"${path.join(__dirname, '../static').replace(/\\/g, '\\\\')}"`
-    })
-  )
+    }))
 }
 
 /**
@@ -194,7 +193,7 @@ if (process.env.NODE_ENV === 'production') {
       'process.env.NODE_ENV': '"production"'
     }),
     new webpack.LoaderOptionsPlugin({
-      minimize: true
+      minimize: false
     })
   )
 }

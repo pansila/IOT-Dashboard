@@ -62,9 +62,13 @@ class Scripts extends EventEmitter {
    * @returns {string}
    * @private
    */
-  _getScriptsFilePath () {
+  _getScriptsFilePath (appName) {
     if (this._customScriptsFilePath) return this._customScriptsFilePath
-    const filePath = path.join(path.dirname(findLogPath()), defaultScriptsFileName)
+    let logPath = findLogPath()
+    if (logPath === false) {
+      logPath = findLogPath(appName)
+    }
+    const filePath = path.join(path.dirname(logPath), defaultScriptsFileName)
     return filePath
   }
 
@@ -74,8 +78,8 @@ class Scripts extends EventEmitter {
    * @returns {string}
    * @private
    */
-  getScriptFilePath (file) {
-    return path.join(this._getScriptsFilePath(), file)
+  getScriptFilePath (file, appName) {
+    return path.join(this._getScriptsFilePath(appName), file)
   }
 
   /**

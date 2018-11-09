@@ -2,6 +2,7 @@
 
 import { app, BrowserWindow, ipcMain } from 'electron'
 import path from 'path'
+import fs from 'fs'
 import {fork} from 'child_process'
 import * as constant from '@utils/Constant'
 import { autoUpdater } from 'electron-updater'
@@ -76,7 +77,14 @@ function runScript (caller, scriptName) {
     runnerPath = path.join(__static, '../src/utils/test-runner.js')
   }
 
-  const child = fork(runnerPath, {stdio: [0, 1, 2, 'ipc']})
+  const child = fork(runnerPath,
+    {
+      env: Object.assign({
+        NODE_DEBUG: 'module',
+        NODE_PATH: process.cwd()
+      }, process.env),
+      stdio: [0, 1, 2, 'ipc']
+    })
   child.on('message', function (m) {
     caller.send(constant.EVENT_ASYNC_REPLY, m)
   })
@@ -141,6 +149,12 @@ ipcMain.on(constant.EVENT_ASYNC_MSG, (ev, arg) => {
 })
 
 app.on('ready', () => {
+  const scriptsPath = path.join(process.cwd(), 'scripts')
+  try {
+    fs.mkdirSync(scriptsPath)
+  } catch (err) {
+  }
+
   if (process.env.NODE_ENV === 'production') {
     let updateCheckTimer
 
