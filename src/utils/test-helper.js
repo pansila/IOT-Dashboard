@@ -1,5 +1,5 @@
 import {exec} from 'child_process'
-import * as constant from './Constant'
+import constant from './Constant'
 
 let script
 

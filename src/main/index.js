@@ -4,7 +4,7 @@ import { app, BrowserWindow, ipcMain } from 'electron'
 import path from 'path'
 import fs from 'fs'
 import {fork} from 'child_process'
-import * as constant from '@utils/Constant'
+import constant from '@utils/Constant'
 import { autoUpdater } from 'electron-updater'
 import log from 'electron-log'
 import settings from '@utils/Settings'
@@ -79,10 +79,10 @@ function runScript (caller, scriptName) {
 
   const child = fork(runnerPath,
     {
-      env: Object.assign({
-        NODE_DEBUG: 'module',
-        NODE_PATH: process.cwd()
-      }, process.env),
+      // env: Object.assign({
+      //   NODE_DEBUG: 'module',
+      //   NODE_PATH: process.cwd()
+      // }, process.env),
       stdio: [0, 1, 2, 'ipc']
     })
   child.on('message', function (m) {

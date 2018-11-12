@@ -61,7 +61,7 @@
 <script>
   import {ipcRenderer} from 'electron'
   import Console from '@components/ConsolePage/Console'
-  import * as constant from '@utils/Constant'
+  import constant from '@utils/Constant'
   import settings from '@utils/Settings'
   import scripts from '@utils/Scripts'
   

@@ -77,7 +77,7 @@
   import fs from 'fs'
   import path from 'path'
   import Vue from 'vue'
-  import * as constant from '@utils/Constant'
+  import constant from '@utils/Constant'
   import scripts from '@utils/Scripts'
 
   export default {

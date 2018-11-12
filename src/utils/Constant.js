@@ -20,7 +20,7 @@ const MSG_UPDATE_NOW = 0
 const MSG_UPDATE_ON_QUIT = 1
 const MSG_NO_UPDATE = 2
 
-export {
+export default {
   EVENT_ASYNC_MSG,
   EVENT_ASYNC_REPLY,
   EVENT_RUN_SCRIPT,

@@ -17,7 +17,7 @@ import {LineParser, LineBuffer, TimestampPrefix, KeywordFilter} from '@utils/Com
 import {PassThrough} from 'stream'
 import fs from 'fs'
 import path from 'path'
-import * as constant from '@utils/Constant'
+import constant from '@utils/Constant'
 import settings from '@utils/Settings'
 
 Terminal.applyAddon(fit)

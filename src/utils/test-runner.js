@@ -1,76 +1,60 @@
-import path from 'path'
-import fs from 'fs'
-import * as constant from './Constant'
-import scripts from './Scripts'
-import {print, scriptInit} from './test-helper'
-import log from 'electron-log'
-// import requirejs from 'requirejs'
+/* use commonjs module syntax to work both in the development and production mode */
+const path = require('path')
+const fs = require('fs')
+const log = require('electron-log')
 
-log.transports.file.level = 'debug'
+// log.transports.file.level = 'debug'
+
+/* ugly: point the path of babel presets to the right position in the production mode */
+const presetEnv = path.join(__dirname, '../../node_modules/babel-preset-env')
+const presetStage0 = path.join(__dirname, '../../node_modules/babel-preset-stage-0')
 
 require('babel-register')({
   'presets': [
-    ['env', {
+    [presetEnv, {
       'targets': { 'node': 8 }
     }],
-    'stage-0'
+    presetStage0
   ]
 })
 
-const logStream = fs.createWriteStream('d:/test.log', {flags: 'a'})
-process.stdout.write = process.stderr.write = logStream.write.bind(logStream)
+/* require them after registration of babel to work in the development mode */
+const constant = require('./Constant').default
+const scripts = require('./Scripts').default
+const print = require('./test-helper').print
+const scriptInit = require('./test-helper').scriptInit
 
-// requirejs.config({
-//   // Use node's special variable __dirname to
-//   // get the directory containing this file.
-//   // Useful if building a library that will
-//   // be used in node but does not require the
-//   // use of node outside
-//   baseUrl: 'junk', // anything to overshadow the file
-//   // Pass the top-level main.js/index.js require
-//   // function to requirejs so that node modules
-//   // are loaded relative to the top-level JS file.
-//   nodeRequire: require
-// })
+// const logStream = fs.createWriteStream('d:/test.log', {flags: 'a'})
+// process.stdout.write = process.stderr.write = logStream.write.bind(logStream)
 
 process.on('message', function (m) {
   const {event, data} = m
+
   if (event === constant.EVENT_RUN_SCRIPT) {
     print('\n=> start the script "' + data + '"')
+
     scriptInit(data)
 
     const scriptPath = path.join(process.cwd(), 'scripts')
     const tempScript = path.join(scriptPath, data)
     const helperPathSrc = path.join(__dirname, '../../dist/electron/testhelper.js')
     const helperPathDst = path.join(process.cwd(), 'test-helper.js')
-    log.debug(tempScript, helperPathSrc, helperPathDst)
+    // log.debug(tempScript, helperPathSrc, helperPathDst)
 
     fs.createReadStream(helperPathSrc).pipe(fs.createWriteStream(helperPathDst)).on('close', () => {
       try {
         fs.unlinkSync(tempScript)
       } catch (err) {
-        // print(JSON.stringify(err))
+        // log.error(err)
       }
 
       const { build: { productName: appName } } = require('../../package.json')
       const testScript = scripts.getScriptFilePath(data, appName)
 
-      // try {
-      //   // requirejs(test)
-      //   // script ends in .js will ignore baseURL
-      //   requirejs(data.slice(0, -3))
-      // } catch (err) {
-      //   log.error(err)
-      // }
-
       fs.createReadStream(testScript).pipe(fs.createWriteStream(tempScript)).on('close', () => {
         try {
-          // script ends in .js will ignore baseURL
-          // requirejs('./scripts/' + data.slice(0, -3))
           const scriptEval = tempScript.replace(/\\/g, '\\$&')
-          log.debug(scriptEval)
           eval(`require('${scriptEval}')`)
-          // requirejs(tempScript.slice(0, -3))
         } catch (err) {
           log.error(err)
         }

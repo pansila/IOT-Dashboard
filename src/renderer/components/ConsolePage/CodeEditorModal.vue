@@ -53,7 +53,7 @@ start()</div>
   import fs from 'fs'
   import ace from 'ace-builds/src-noconflict/ace'
   import setupAce from '@utils/ace-webpack-resolver'
-  import * as constant from '@utils/Constant'
+  import constant from '@utils/Constant'
   import scripts from '@utils/Scripts'
 
   setupAce(ace)

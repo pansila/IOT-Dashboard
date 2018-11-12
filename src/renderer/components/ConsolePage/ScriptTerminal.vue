@@ -10,7 +10,7 @@
   import 'xterm/dist/xterm.css'
   import resizesensor from '@components/ResizeSensor'
   import {execFile} from 'child_process'
-  import * as constant from '@utils/Constant'
+  import constant from '@utils/Constant'
 
   Terminal.applyAddon(fit)
 
